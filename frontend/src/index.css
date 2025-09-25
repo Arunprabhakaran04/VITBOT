@@ -1,0 +1,286 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=DM+Sans:wght@400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Futuristic RAG Chatbot Design System */
+
+@layer base {
+  :root {
+    /* Dark Theme Colors (HSL) */
+    --background: 215 28% 7%;           /* #0D1117 - deep charcoal */
+    --surface: 218 23% 11%;             /* #161B22 - slightly lighter */
+    --foreground: 210 22% 93%;          /* #E6EDF3 - off-white text */
+    
+    --primary: 213 94% 68%;             /* #3B82F6 - vivid blue */
+    --primary-glow: 213 94% 78%;        /* lighter blue for glows */
+    --primary-foreground: 0 0% 100%;    /* white text on primary */
+    
+    --secondary: 258 90% 66%;           /* #8B5CF6 - rich purple */
+    --secondary-glow: 258 90% 76%;      /* lighter purple for glows */
+    --secondary-foreground: 0 0% 100%;  /* white text on secondary */
+    
+    --success: 142 76% 47%;             /* #22C55E - emerald green */
+    --warning: 43 96% 56%;              /* #FACC15 - amber yellow */
+    --error: 0 84% 60%;                 /* #EF4444 - crimson red */
+    
+    --muted: 215 14% 34%;               /* #9CA3AF - soft gray */
+    --muted-foreground: 215 14% 64%;    /* lighter gray for muted text */
+    
+    --border: 218 23% 15%;              /* subtle borders */
+    --input: 218 23% 15%;               /* input backgrounds */
+    --ring: 213 94% 68%;                /* focus rings - primary color */
+    
+    --card: 218 23% 11%;                /* same as surface */
+    --card-foreground: 210 22% 93%;     /* same as foreground */
+    
+    --popover: 218 23% 11%;
+    --popover-foreground: 210 22% 93%;
+    
+    --accent: 218 23% 15%;
+    --accent-foreground: 210 22% 93%;
+    
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+    
+    --radius: 0.75rem;
+    
+    /* Custom Design Tokens */
+    --gradient-primary: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--secondary)));
+    --gradient-surface: linear-gradient(145deg, hsl(var(--surface)), hsl(218 23% 13%));
+    --gradient-glow: linear-gradient(135deg, hsl(var(--primary-glow) / 0.2), hsl(var(--secondary-glow) / 0.2));
+    
+    --shadow-glow: 0 0 20px hsl(var(--primary) / 0.3);
+    --shadow-surface: 0 4px 12px hsl(215 28% 4% / 0.4);
+    --shadow-card: 0 2px 8px hsl(215 28% 4% / 0.3);
+    
+    --blur: blur(16px);
+    --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-slow: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  
+  html {
+    @apply scroll-smooth;
+  }
+  
+  body {
+    @apply bg-background text-foreground font-inter antialiased;
+    font-feature-settings: "cv11", "ss01";
+    font-variation-settings: "opsz" 32;
+  }
+  
+  /* Typography */
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-dm tracking-tight;
+  }
+  
+  /* Scrollbar Styling */
+  ::-webkit-scrollbar {
+    @apply w-2;
+  }
+  
+  ::-webkit-scrollbar-track {
+    @apply bg-surface/50 rounded-full;
+  }
+  
+  ::-webkit-scrollbar-thumb {
+    @apply bg-muted/70 rounded-full border-none hover:bg-muted;
+  }
+  
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-muted-foreground/80;
+  }
+  
+  /* Chat scrollbar - more visible and always shown */
+  .chat-scroll::-webkit-scrollbar {
+    @apply w-4;
+    display: block !important;
+  }
+  
+  .chat-scroll::-webkit-scrollbar-track {
+    @apply bg-surface/50 rounded-full m-1;
+    border: 1px solid hsl(var(--border) / 0.2);
+  }
+  
+  .chat-scroll::-webkit-scrollbar-thumb {
+    @apply bg-primary/50 rounded-full border-none;
+    border: 2px solid transparent;
+    background-clip: content-box;
+  }
+  
+  .chat-scroll::-webkit-scrollbar-thumb:hover {
+    @apply bg-primary/70;
+  }
+  
+  .chat-scroll::-webkit-scrollbar-thumb:active {
+    @apply bg-primary/80;
+  }
+  
+  /* Force scrollbar to always be visible */
+  .chat-scroll {
+    scrollbar-width: thin;
+    scrollbar-color: hsl(var(--primary) / 0.5) hsl(var(--surface) / 0.5);
+  }
+}
+
+@layer components {
+  /* Glassmorphism Effects */
+  .glass {
+    background: hsl(var(--surface) / 0.8);
+    backdrop-filter: var(--blur);
+    border: 1px solid hsl(var(--border) / 0.3);
+  }
+  
+  .glass-strong {
+    background: hsl(var(--surface) / 0.95);
+    backdrop-filter: var(--blur);
+    border: 1px solid hsl(var(--border) / 0.5);
+  }
+  
+  /* Glow Effects */
+  .glow-primary {
+    box-shadow: 0 0 20px hsl(var(--primary) / 0.3);
+  }
+  
+  .glow-secondary {
+    box-shadow: 0 0 20px hsl(var(--secondary) / 0.3);
+  }
+  
+  /* Animated Gradient Backgrounds */
+  .gradient-primary {
+    background: var(--gradient-primary);
+  }
+  
+  .gradient-surface {
+    background: var(--gradient-surface);
+  }
+  
+  .gradient-glow {
+    background: var(--gradient-glow);
+  }
+  
+  /* Message Bubble Styles */
+  .message-user {
+    background: var(--gradient-primary);
+    @apply text-white shadow-lg rounded-2xl rounded-br-md;
+  }
+  
+  .message-assistant {
+    @apply bg-surface border border-border/30 shadow-card rounded-2xl rounded-bl-md;
+  }
+  
+  /* Focus States */
+  .focus-ring {
+    @apply focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-background outline-none;
+  }
+  
+  /* Hover Effects */
+  .hover-lift {
+    @apply hover:scale-105 hover:shadow-lg transition-transform duration-200;
+  }
+  
+  .hover-glow {
+    @apply hover:shadow-glow transition-shadow duration-300;
+  }
+}
+
+@layer utilities {
+  /* Animation Classes */
+  .animate-fade-in {
+    animation: fadeIn 0.3s ease-out;
+  }
+  
+  .animate-slide-up {
+    animation: slideUp 0.3s ease-out;
+  }
+  
+  .animate-slide-down {
+    animation: slideDown 0.3s ease-out;
+  }
+  
+  .animate-scale-in {
+    animation: scaleIn 0.2s ease-out;
+  }
+  
+  .animate-pulse-glow {
+    animation: pulseGlow 2s infinite;
+  }
+  
+  /* Text Utilities */
+  .text-gradient {
+    background: var(--gradient-primary);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideDown {
+  from {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    transform: scale(0.95);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes pulseGlow {
+  0%, 100% {
+    box-shadow: 0 0 20px hsl(var(--primary) / 0.3);
+  }
+  50% {
+    box-shadow: 0 0 30px hsl(var(--primary) / 0.6);
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+  }
+}

@@ -1,0 +1,142 @@
+2025-09-10 00:47:02 | INFO     | CELERY | 🚀 Starting PDF processing task for user 17 in Celery worker
+2025-09-10 00:47:02 | INFO     | CELERY | 📋 Task ID: 7434c6b3-d71b-45a7-80f5-19df6c95b021
+2025-09-10 00:47:02 | INFO     | CELERY | 📄 File: kv_resume_iter_2 (1).pdf
+2025-09-10 00:47:02 | INFO     | CELERY | 📂 Path: D:\FastAPI\social_media_api\backend\app\utils\../../uploads\user_17\20250910004702_kv_resume_iter_2 (1).pdf
+2025-09-10 00:47:02 | INFO     | CELERY | 🔧 Process ID: 19592
+2025-09-10 00:47:03 | INFO     | CELERY | 🤖 Initializing embeddings model for the first time - this may take a few minutes...
+2025-09-10 00:47:03 | INFO     | CELERY | 📥 Downloading/loading BAAI/bge-small-en-v1.5 model...
+2025-09-10 00:47:29 | SUCCESS  | CELERY | ✅ Embeddings model loaded successfully - subsequent uploads will be faster!
+2025-09-10 00:47:29 | INFO     | CELERY | 🚀 DocumentProcessor initialized with multilingual support (English + Tamil)
+2025-09-10 00:47:29 | INFO     | CELERY | Loading and extracting text from PDF with language detection...
+2025-09-10 00:47:32 | INFO     | CELERY | 📝 Detected language: english
+2025-09-10 00:47:32 | INFO     | CELERY | 📊 Text stats: 5087 chars, Tamil: 0.0%, English: 91.4%
+2025-09-10 00:47:32 | INFO     | CELERY | PDF text extracted successfully - 5087 characters, Language: english
+2025-09-10 00:47:32 | INFO     | CELERY | Splitting english text into chunks...
+2025-09-10 00:47:32 | INFO     | CELERY | Text split into 7 chunks for english processing
+2025-09-10 00:47:32 | INFO     | CELERY | Creating english embeddings...
+2025-09-10 00:47:40 | INFO     | CELERY | ✅ Created english vector store with 7 vectors
+2025-09-10 00:47:40 | INFO     | CELERY | Vector store created with 7 vectors using english embeddings
+2025-09-10 00:47:40 | INFO     | CELERY | Saving english vector store...
+2025-09-10 00:47:40 | INFO     | CELERY | Vector store saved to: D:\FastAPI\social_media_api\backend\app\services\../../vector_stores\user_17\current_pdf
+2025-09-10 00:47:40 | INFO     | CELERY | Finalizing database update with language information...
+2025-09-10 00:47:40 | INFO     | CELERY | English PDF processing completed successfully for user 17
+2025-09-10 00:47:40 | INFO     | CELERY | Final stats: 7 vectors, 7 chunks, Language: english
+2025-09-10 00:47:40 | INFO     | CELERY | Embedding model used: BAAI/bge-small-en-v1.5
+2025-09-10 00:50:05 | INFO     | CELERY | 🚀 Starting PDF processing task for user 17 in Celery worker
+2025-09-10 00:50:05 | INFO     | CELERY | 📋 Task ID: 610d412e-3ed8-4a5b-822b-3a213a432048
+2025-09-10 00:50:05 | INFO     | CELERY | 📄 File: tamil pdf.pdf
+2025-09-10 00:50:05 | INFO     | CELERY | 📂 Path: D:\FastAPI\social_media_api\backend\app\utils\../../uploads\user_17\20250910005005_tamil pdf.pdf
+2025-09-10 00:50:05 | INFO     | CELERY | 🔧 Process ID: 19592
+2025-09-10 00:50:05 | INFO     | CELERY | ⚡ Using cached embeddings model - fast loading!
+2025-09-10 00:50:07 | INFO     | CELERY | 🚀 DocumentProcessor initialized with multilingual support (English + Tamil)
+2025-09-10 00:50:07 | INFO     | CELERY | Loading and extracting text from PDF with language detection...
+2025-09-10 00:50:07 | INFO     | CELERY | 📝 Detected language: tamil
+2025-09-10 00:50:07 | INFO     | CELERY | 📊 Text stats: 626 chars, Tamil: 94.4%, English: 0.0%
+2025-09-10 00:50:07 | INFO     | CELERY | 🔧 Applied Tamil text normalization
+2025-09-10 00:50:07 | INFO     | CELERY | PDF text extracted successfully - 612 characters, Language: tamil
+2025-09-10 00:50:07 | INFO     | CELERY | Splitting tamil text into chunks...
+2025-09-10 00:50:07 | INFO     | CELERY | Text split into 1 chunks for tamil processing
+2025-09-10 00:50:07 | INFO     | CELERY | Creating tamil embeddings...
+2025-09-10 00:50:16 | INFO     | CELERY | ✅ Created tamil vector store with 1 vectors
+2025-09-10 00:50:16 | INFO     | CELERY | Vector store created with 1 vectors using tamil embeddings
+2025-09-10 00:50:16 | INFO     | CELERY | Saving tamil vector store...
+2025-09-10 00:50:16 | INFO     | CELERY | Vector store saved to: D:\FastAPI\social_media_api\backend\app\services\../../vector_stores\user_17\current_pdf
+2025-09-10 00:50:16 | INFO     | CELERY | Finalizing database update with language information...
+2025-09-10 00:50:16 | INFO     | CELERY | Tamil PDF processing completed successfully for user 17
+2025-09-10 00:50:16 | INFO     | CELERY | Final stats: 1 vectors, 1 chunks, Language: tamil
+2025-09-10 00:50:16 | INFO     | CELERY | Embedding model used: l3cube-pune/tamil-sentence-similarity-sbert
+2025-09-10 01:05:24 | INFO     | CELERY | 🚀 Starting PDF processing task for user 17 in Celery worker
+2025-09-10 01:05:24 | INFO     | CELERY | 📋 Task ID: 81fc8e0c-efe1-4bb9-bda1-4544ec9b6ddb
+2025-09-10 01:05:24 | INFO     | CELERY | 📄 File: tamil pdf.pdf
+2025-09-10 01:05:24 | INFO     | CELERY | 📂 Path: D:\FastAPI\social_media_api\backend\app\utils\../../uploads\user_17\20250910010523_tamil pdf.pdf
+2025-09-10 01:05:24 | INFO     | CELERY | 🔧 Process ID: 1092
+2025-09-10 01:05:24 | INFO     | CELERY | 🤖 Initializing embeddings model for the first time - this may take a few minutes...
+2025-09-10 01:05:24 | INFO     | CELERY | 📥 Downloading/loading BAAI/bge-small-en-v1.5 model...
+2025-09-10 01:05:50 | SUCCESS  | CELERY | ✅ Embeddings model loaded successfully - subsequent uploads will be faster!
+2025-09-10 01:05:51 | INFO     | CELERY | 🚀 DocumentProcessor initialized with multilingual support (English + Tamil)
+2025-09-10 01:05:51 | INFO     | CELERY | Loading and extracting text from PDF with language detection...
+2025-09-10 01:05:51 | INFO     | CELERY | 📝 Detected language: tamil
+2025-09-10 01:05:51 | INFO     | CELERY | 📊 Text stats: 626 chars, Tamil: 94.4%, English: 0.0%
+2025-09-10 01:05:51 | INFO     | CELERY | 🔧 Applied Tamil text normalization
+2025-09-10 01:05:51 | INFO     | CELERY | PDF text extracted successfully - 612 characters, Language: tamil
+2025-09-10 01:05:51 | INFO     | CELERY | Splitting tamil text into chunks...
+2025-09-10 01:05:52 | INFO     | CELERY | Text split into 1 chunks for tamil processing
+2025-09-10 01:05:52 | INFO     | CELERY | Creating tamil embeddings...
+2025-09-10 01:06:00 | INFO     | CELERY | ✅ Created tamil vector store with 1 vectors
+2025-09-10 01:06:00 | INFO     | CELERY | Vector store created with 1 vectors using tamil embeddings
+2025-09-10 01:06:00 | INFO     | CELERY | Saving tamil vector store...
+2025-09-10 01:06:00 | INFO     | CELERY | Vector store saved to: D:\FastAPI\social_media_api\backend\app\services\../../vector_stores\user_17\current_pdf
+2025-09-10 01:06:00 | INFO     | CELERY | Finalizing database update with language information...
+2025-09-10 01:06:00 | INFO     | CELERY | Tamil PDF processing completed successfully for user 17
+2025-09-10 01:06:00 | INFO     | CELERY | Final stats: 1 vectors, 1 chunks, Language: tamil
+2025-09-10 01:06:00 | INFO     | CELERY | Embedding model used: l3cube-pune/tamil-sentence-similarity-sbert
+2025-09-10 15:15:21 | INFO     | CELERY | 🚀 Starting PDF processing task for user 17 in Celery worker
+2025-09-10 15:15:21 | INFO     | CELERY | 📋 Task ID: 9ae6af8f-f4ef-4db4-8037-859373930dd9
+2025-09-10 15:15:21 | INFO     | CELERY | 📄 File: Absolute Zero.pdf
+2025-09-10 15:15:21 | INFO     | CELERY | 📂 Path: D:\FastAPI\social_media_api\backend\app\utils\../../uploads\user_17\20250910151521_Absolute Zero.pdf
+2025-09-10 15:15:21 | INFO     | CELERY | 🔧 Process ID: 26220
+2025-09-10 15:15:21 | INFO     | CELERY | 🤖 Initializing embeddings model for the first time - this may take a few minutes...
+2025-09-10 15:15:21 | INFO     | CELERY | 📥 Downloading/loading BAAI/bge-small-en-v1.5 model...
+2025-09-10 15:15:52 | SUCCESS  | CELERY | ✅ Embeddings model loaded successfully - subsequent uploads will be faster!
+2025-09-10 15:15:53 | INFO     | CELERY | 🚀 DocumentProcessor initialized with multilingual support (English + Tamil)
+2025-09-10 15:15:53 | INFO     | CELERY | Loading and extracting text from PDF with language detection...
+2025-09-10 15:15:55 | INFO     | CELERY | 📝 Detected language: english
+2025-09-10 15:15:55 | INFO     | CELERY | 📊 Text stats: 168165 chars, Tamil: 0.0%, English: 82.4%
+2025-09-10 15:15:55 | INFO     | CELERY | PDF text extracted successfully - 168165 characters, Language: english
+2025-09-10 15:15:55 | INFO     | CELERY | Splitting english text into chunks...
+2025-09-10 15:15:55 | INFO     | CELERY | Text split into 222 chunks for english processing
+2025-09-10 15:15:55 | INFO     | CELERY | Creating english embeddings...
+2025-09-10 15:16:31 | INFO     | CELERY | ✅ Created english vector store with 222 vectors
+2025-09-10 15:16:31 | INFO     | CELERY | Vector store created with 222 vectors using english embeddings
+2025-09-10 15:16:31 | INFO     | CELERY | Saving english vector store...
+2025-09-10 15:16:31 | INFO     | CELERY | Vector store saved to: D:\FastAPI\social_media_api\backend\app\services\../../vector_stores\user_17\current_pdf
+2025-09-10 15:16:31 | INFO     | CELERY | Finalizing database update with language information...
+2025-09-10 15:16:31 | INFO     | CELERY | English PDF processing completed successfully for user 17
+2025-09-10 15:16:31 | INFO     | CELERY | Final stats: 222 vectors, 222 chunks, Language: english
+2025-09-10 15:16:31 | INFO     | CELERY | Embedding model used: BAAI/bge-small-en-v1.5
+2025-09-10 15:17:57 | INFO     | CELERY | 🚀 Starting PDF processing task for user 17 in Celery worker
+2025-09-10 15:17:57 | INFO     | CELERY | 📋 Task ID: 92a9f21d-3ff3-4528-a123-2f3d92cd72ee
+2025-09-10 15:17:57 | INFO     | CELERY | 📄 File: tamil pdf.pdf
+2025-09-10 15:17:57 | INFO     | CELERY | 📂 Path: D:\FastAPI\social_media_api\backend\app\utils\../../uploads\user_17\20250910151757_tamil pdf.pdf
+2025-09-10 15:17:57 | INFO     | CELERY | 🔧 Process ID: 26220
+2025-09-10 15:17:57 | INFO     | CELERY | ⚡ Using cached embeddings model - fast loading!
+2025-09-10 15:17:58 | INFO     | CELERY | 🚀 DocumentProcessor initialized with multilingual support (English + Tamil)
+2025-09-10 15:17:58 | INFO     | CELERY | Loading and extracting text from PDF with language detection...
+2025-09-10 15:17:58 | INFO     | CELERY | 📝 Detected language: tamil
+2025-09-10 15:17:58 | INFO     | CELERY | 📊 Text stats: 626 chars, Tamil: 94.4%, English: 0.0%
+2025-09-10 15:17:58 | INFO     | CELERY | 🔧 Applied Tamil text normalization
+2025-09-10 15:17:58 | INFO     | CELERY | PDF text extracted successfully - 612 characters, Language: tamil
+2025-09-10 15:17:58 | INFO     | CELERY | Splitting tamil text into chunks...
+2025-09-10 15:17:58 | INFO     | CELERY | Text split into 1 chunks for tamil processing
+2025-09-10 15:17:58 | INFO     | CELERY | Creating tamil embeddings...
+2025-09-10 15:18:45 | INFO     | CELERY | ✅ Created tamil vector store with 1 vectors
+2025-09-10 15:18:45 | INFO     | CELERY | Vector store created with 1 vectors using tamil embeddings
+2025-09-10 15:18:45 | INFO     | CELERY | Saving tamil vector store...
+2025-09-10 15:18:45 | INFO     | CELERY | Vector store saved to: D:\FastAPI\social_media_api\backend\app\services\../../vector_stores\user_17\current_pdf
+2025-09-10 15:18:45 | INFO     | CELERY | Finalizing database update with language information...
+2025-09-10 15:18:45 | INFO     | CELERY | Tamil PDF processing completed successfully for user 17
+2025-09-10 15:18:45 | INFO     | CELERY | Final stats: 1 vectors, 1 chunks, Language: tamil
+2025-09-10 15:18:45 | INFO     | CELERY | Embedding model used: l3cube-pune/tamil-sentence-similarity-sbert
+2025-09-10 15:45:55 | INFO     | CELERY | 🚀 Starting PDF processing task for user 17 in Celery worker
+2025-09-10 15:45:55 | INFO     | CELERY | 📋 Task ID: f06408e6-bd08-4967-ad2b-9ba41bfea5b2
+2025-09-10 15:45:55 | INFO     | CELERY | 📄 File: tamil pdf.pdf
+2025-09-10 15:45:55 | INFO     | CELERY | 📂 Path: D:\FastAPI\social_media_api\backend\app\utils\../../uploads\user_17\20250910154555_tamil pdf.pdf
+2025-09-10 15:45:55 | INFO     | CELERY | 🔧 Process ID: 26220
+2025-09-10 15:45:55 | INFO     | CELERY | ⚡ Using cached embeddings model - fast loading!
+2025-09-10 15:45:56 | INFO     | CELERY | 🚀 DocumentProcessor initialized with multilingual support (English + Tamil)
+2025-09-10 15:45:56 | INFO     | CELERY | Loading and extracting text from PDF with language detection...
+2025-09-10 15:45:56 | INFO     | CELERY | 📝 Detected language: tamil
+2025-09-10 15:45:56 | INFO     | CELERY | 📊 Text stats: 626 chars, Tamil: 94.4%, English: 0.0%
+2025-09-10 15:45:56 | INFO     | CELERY | 🔧 Applied Tamil text normalization
+2025-09-10 15:45:56 | INFO     | CELERY | PDF text extracted successfully - 612 characters, Language: tamil
+2025-09-10 15:45:56 | INFO     | CELERY | Splitting tamil text into chunks...
+2025-09-10 15:45:56 | INFO     | CELERY | Text split into 1 chunks for tamil processing
+2025-09-10 15:45:56 | INFO     | CELERY | Creating tamil embeddings...
+2025-09-10 15:45:57 | INFO     | CELERY | ✅ Created tamil vector store with 1 vectors
+2025-09-10 15:45:57 | INFO     | CELERY | Vector store created with 1 vectors using tamil embeddings
+2025-09-10 15:45:57 | INFO     | CELERY | Saving tamil vector store...
+2025-09-10 15:45:57 | INFO     | CELERY | Vector store saved to: D:\FastAPI\social_media_api\backend\app\services\../../vector_stores\user_17\current_pdf
+2025-09-10 15:45:57 | INFO     | CELERY | Finalizing database update with language information...
+2025-09-10 15:45:57 | INFO     | CELERY | Tamil PDF processing completed successfully for user 17
+2025-09-10 15:45:57 | INFO     | CELERY | Final stats: 1 vectors, 1 chunks, Language: tamil
+2025-09-10 15:45:57 | INFO     | CELERY | Embedding model used: l3cube-pune/tamil-sentence-similarity-sbert

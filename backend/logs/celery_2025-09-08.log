@@ -1,0 +1,472 @@
+2025-09-08 19:44:11 | INFO     | CELERY | Starting PDF processing task for user 17
+2025-09-08 19:44:11 | INFO     | CELERY | Task ID: 6be5d5c1-3359-415c-8637-114a87ce78fd
+2025-09-08 19:44:11 | INFO     | CELERY | File: Absolute Zero.pdf
+2025-09-08 19:44:11 | INFO     | CELERY | Path: D:\FastAPI\social_media_api\backend\app\utils\../../uploads\user_17\20250908194411_Absolute Zero.pdf
+2025-09-08 19:44:12 | ERROR    | CELERY | Error in PDF processing task: 0
+2025-09-08 19:44:12 | ERROR    | CELERY | Full error traceback:
+Traceback (most recent call last):
+
+  File "D:\FastAPI\social_media_api\start_celery.py", line 42, in <module>
+    celery_app.worker_main([
+    │          └ <function Celery.worker_main at 0x0000025EB75F2AC0>
+    └ <Celery pdf_processor at 0x25eb6ca1d60>
+
+  File "D:\FastAPI\social_media_api\venv\Lib\site-packages\celery\app\base.py", line 388, in worker_main
+    self.start(argv=argv)
+    │    │          └ ['worker', '--loglevel=info', '--pool=solo', '--queues=pdf_processing', '--without-gossip', '--without-mingle', '--without-he...
+    │    └ <function Celery.start at 0x0000025EB75F2A20>
+    └ <Celery pdf_processor at 0x25eb6ca1d60>
+  File "D:\FastAPI\social_media_api\venv\Lib\site-packages\celery\app\base.py", line 368, in start
+    celery.main(args=argv, standalone_mode=False)
+    │      │         └ ['worker', '--loglevel=info', '--pool=solo', '--queues=pdf_processing', '--without-gossip', '--without-mingle', '--without-he...
+    │      └ <function BaseCommand.main at 0x0000025EB6CD44A0>
+    └ <DYMGroup celery>
+  File "D:\FastAPI\social_media_api\venv\Lib\site-packages\click\core.py", line 1082, in main
+    rv = self.invoke(ctx)
+         │    │      └ <click.core.Context object at 0x0000025EB844A1B0>
+         │    └ <function MultiCommand.invoke at 0x0000025EB6CD56C0>
+         └ <DYMGroup celery>
+  File "D:\FastAPI\social_media_api\venv\Lib\site-packages\click\core.py", line 1697, in invoke
+    return _process_result(sub_ctx.command.invoke(sub_ctx))
+           │               │       │       │      └ <click.core.Context object at 0x0000025EB7C87860>
+           │               │       │       └ <function Command.invoke at 0x0000025EB6CD5080>
+           │               │       └ <CeleryDaemonCommand worker>
+           │               └ <click.core.Context object at 0x0000025EB7C87860>
+           └ <function MultiCommand.invoke.<locals>._process_result at 0x0000025EB6D94540>
+  File "D:\FastAPI\social_media_api\venv\Lib\site-packages\click\core.py", line 1443, in invoke
+    return ctx.invoke(self.callback, **ctx.params)
+           │   │      │    │           │   └ {'loglevel': 20, 'pool': <class 'celery.concurrency.solo.TaskPool'>, 'queues': ['pdf_processing'], 'without_gossip': True, 'w...
+           │   │      │    │           └ <click.core.Context object at 0x0000025EB7C87860>
+           │   │      │    └ <function worker at 0x0000025EB7C22E80>
+           │   │      └ <CeleryDaemonCommand worker>
+           │   └ <function Context.invoke at 0x0000025EB6CC79C0>
+           └ <click.core.Context object at 0x0000025EB7C87860>
+  File "D:\FastAPI\social_media_api\venv\Lib\site-packages\click\core.py", line 788, in invoke
+    return __callback(*args, **kwargs)
+                       │       └ {'loglevel': 20, 'pool': <class 'celery.concurrency.solo.TaskPool'>, 'queues': ['pdf_processing'], 'without_gossip': True, 'w...
+                       └ ()
+  File "D:\FastAPI\social_media_api\venv\Lib\site-packages\click\decorators.py", line 33, in new_func
+    return f(get_current_context(), *args, **kwargs)
+           │ │                       │       └ {'loglevel': 20, 'pool': <class 'celery.concurrency.solo.TaskPool'>, 'queues': ['pdf_processing'], 'without_gossip': True, 'w...
+           │ │                       └ ()
+           │ └ <function get_current_context at 0x0000025EB6C92B60>
+           └ <function worker at 0x0000025EB7C22DE0>
+  File "D:\FastAPI\social_media_api\venv\Lib\site-packages\celery\bin\base.py", line 134, in caller
+    return f(ctx, *args, **kwargs)
+           │ │     │       └ {'loglevel': 20, 'pool': <class 'celery.concurrency.solo.TaskPool'>, 'queues': ['pdf_processing'], 'without_gossip': True, 'w...
+           │ │     └ ()
+           │ └ <click.core.Context object at 0x0000025EB7C87860>
+           └ <function worker at 0x0000025EB7C22D40>
+  File "D:\FastAPI\social_media_api\venv\Lib\site-packages\celery\bin\worker.py", line 356, in worker
+    worker.start()
+    │      └ <function WorkController.start at 0x0000025EB7AF8680>
+    └ <Worker: celery@ARUN (running)>
+  File "D:\FastAPI\social_media_api\venv\Lib\site-packages\celery\worker\worker.py", line 202, in start
+    self.blueprint.start(self)
+    │    │         │     └ <Worker: celery@ARUN (running)>
+    │    │         └ <function Blueprint.start at 0x0000025EB7B24360>
+    │    └ <celery.worker.worker.WorkController.Blueprint object at 0x0000025ED8C43140>
+    └ <Worker: celery@ARUN (running)>
+  File "D:\FastAPI\social_media_api\venv\Lib\site-packages\celery\bootsteps.py", line 116, in start
+    step.start(parent)
+    │    │     └ <Worker: celery@ARUN (running)>
+    │    └ <function StartStopStep.start at 0x0000025EB7B25620>
+    └ <step: Consumer>
+  File "D:\FastAPI\social_media_api\venv\Lib\site-packages\celery\bootsteps.py", line 365, in start
+    return self.obj.start()
+           │    │   └ <function Consumer.start at 0x0000025ED8D04D60>
+           │    └ <Consumer: celery@ARUN (running)>
+           └ <step: Consumer>
+  File "D:\FastAPI\social_media_api\venv\Lib\site-packages\celery\worker\consumer\consumer.py", line 340, in start
+    blueprint.start(self)
+    │         │     └ <Consumer: celery@ARUN (running)>
+    │         └ <function Blueprint.start at 0x0000025EB7B24360>
+    └ <celery.worker.consumer.consumer.Consumer.Blueprint object at 0x0000025ED8CBBEC0>
+  File "D:\FastAPI\social_media_api\venv\Lib\site-packages\celery\bootsteps.py", line 116, in start
+    step.start(parent)
+    │    │     └ <Consumer: celery@ARUN (running)>
+    │    └ <function Evloop.start at 0x0000025ED8D06020>
+    └ <step: event loop>
+  File "D:\FastAPI\social_media_api\venv\Lib\site-packages\celery\worker\consumer\consumer.py", line 742, in start
+    c.loop(*c.loop_args())
+    │ │     │ └ <function Consumer.loop_args at 0x0000025ED8D05260>
+    │ │     └ <Consumer: celery@ARUN (running)>
+    │ └ <function synloop at 0x0000025ED8D04540>
+    └ <Consumer: celery@ARUN (running)>
+  File "D:\FastAPI\social_media_api\venv\Lib\site-packages\celery\worker\loops.py", line 130, in synloop
+    connection.drain_events(timeout=2.0)
+    │          └ <function Connection.drain_events at 0x0000025EB69F7EC0>
+    └ <Connection: redis://localhost:6379/0 at 0x25ed8c430b0>
+  File "D:\FastAPI\social_media_api\venv\Lib\site-packages\kombu\connection.py", line 341, in drain_events
+    return self.transport.drain_events(self.connection, **kwargs)
+           │    │                      │    │             └ {'timeout': 2.0}
+           │    │                      │    └ <property object at 0x0000025EB6A24EF0>
+           │    │                      └ <Connection: redis://localhost:6379/0 at 0x25ed8c430b0>
+           │    └ <property object at 0x0000025EB6A25490>
+           └ <Connection: redis://localhost:6379/0 at 0x25ed8c430b0>
+  File "D:\FastAPI\social_media_api\venv\Lib\site-packages\kombu\transport\virtual\base.py", line 997, in drain_events
+    get(self._deliver, timeout=timeout)
+    │   │    │                 └ 2.0
+    │   │    └ <function Transport._deliver at 0x0000025ED8CD47C0>
+    │   └ <kombu.transport.redis.Transport object at 0x0000025ED8D43650>
+    └ <bound method MultiChannelPoller.get of <kombu.transport.redis.MultiChannelPoller object at 0x0000025ED8D43710>>
+  File "D:\FastAPI\social_media_api\venv\Lib\site-packages\kombu\transport\redis.py", line 598, in get
+    ret = self.handle_event(fileno, event)
+          │    │            │       └ 1
+          │    │            └ 984
+          │    └ <function MultiChannelPoller.handle_event at 0x0000025ED8CD6CA0>
+          └ <kombu.transport.redis.MultiChannelPoller object at 0x0000025ED8D43710>
+  File "D:\FastAPI\social_media_api\venv\Lib\site-packages\kombu\transport\redis.py", line 580, in handle_event
+    return self.on_readable(fileno), self
+           │    │           │        └ <kombu.transport.redis.MultiChannelPoller object at 0x0000025ED8D43710>
+           │    │           └ 984
+           │    └ <function MultiChannelPoller.on_readable at 0x0000025ED8CD6C00>
+           └ <kombu.transport.redis.MultiChannelPoller object at 0x0000025ED8D43710>
+  File "D:\FastAPI\social_media_api\venv\Lib\site-packages\kombu\transport\redis.py", line 576, in on_readable
+    chan.handlers[type]()
+    │    │        └ 'BRPOP'
+    │    └ {'BRPOP': <bound method Channel._brpop_read of <kombu.transport.redis.Channel object at 0x0000025ED8D436E0>>, 'LISTEN': <boun...
+    └ <kombu.transport.redis.Channel object at 0x0000025ED8D436E0>
+  File "D:\FastAPI\social_media_api\venv\Lib\site-packages\kombu\transport\redis.py", line 986, in _brpop_read
+    self.connection._deliver(loads(bytes_to_str(item)), dest)
+    │    │          │        │     │            │       └ 'pdf_processing'
+    │    │          │        │     │            └ b'{"body": "W1sxNywgIkQ6XFxGYXN0QVBJXFxzb2NpYWxfbWVkaWFfYXBpXFxiYWNrZW5kXFxhcHBcXHV0aWxzXFwuLi8uLi91cGxvYWRzXFx1c2VyXzE3XFwyM...
+    │    │          │        │     └ <function bytes_to_str at 0x0000025EB69BA7A0>
+    │    │          │        └ <function loads at 0x0000025EB6A34B80>
+    │    │          └ <function Transport._deliver at 0x0000025ED8CD47C0>
+    │    └ <kombu.transport.redis.Transport object at 0x0000025ED8D43650>
+    └ <kombu.transport.redis.Channel object at 0x0000025ED8D436E0>
+  File "D:\FastAPI\social_media_api\venv\Lib\site-packages\kombu\transport\virtual\base.py", line 1017, in _deliver
+    callback(message)
+    │        └ {'body': 'W1sxNywgIkQ6XFxGYXN0QVBJXFxzb2NpYWxfbWVkaWFfYXBpXFxiYWNrZW5kXFxhcHBcXHV0aWxzXFwuLi8uLi91cGxvYWRzXFx1c2VyXzE3XFwyMDI...
+    └ <function Channel.basic_consume.<locals>._callback at 0x0000025ED8D73D80>
+  File "D:\FastAPI\social_media_api\venv\Lib\site-packages\kombu\transport\virtual\base.py", line 639, in _callback
+    return callback(message)
+           │        └ <Message object at 0x25ed8ca2960 with details {'state': 'RECEIVED', 'content_type': 'application/json', 'delivery_tag': '6b0d...
+           └ <bound method Consumer._receive_callback of <Consumer: [<Queue pdf_processing -> <Exchange pdf_processing(direct) bound to ch...
+  File "D:\FastAPI\social_media_api\venv\Lib\site-packages\kombu\messaging.py", line 668, in _receive_callback
+    return on_m(message) if on_m else self.receive(decoded, message)
+           │    │           │         │    │       │        └ <Message object at 0x25ed8ca2960 with details {'state': 'RECEIVED', 'content_type': 'application/json', 'delivery_tag': '6b0d...
+           │    │           │         │    │       └ None
+           │    │           │         │    └ <function Consumer.receive at 0x0000025EB6D102C0>
+           │    │           │         └ <Consumer: [<Queue pdf_processing -> <Exchange pdf_processing(direct) bound to chan:1> -> pdf_processing bound to chan:1>]>
+           │    │           └ <function Consumer.create_task_handler.<locals>.on_task_received at 0x0000025ED8D73C40>
+           │    └ <Message object at 0x25ed8ca2960 with details {'state': 'RECEIVED', 'content_type': 'application/json', 'delivery_tag': '6b0d...
+           └ <function Consumer.create_task_handler.<locals>.on_task_received at 0x0000025ED8D73C40>
+  File "D:\FastAPI\social_media_api\venv\Lib\site-packages\celery\worker\consumer\consumer.py", line 684, in on_task_received
+    strategy(
+    └ <function default.<locals>.task_message_handler at 0x0000025ED8D71D00>
+  File "D:\FastAPI\social_media_api\venv\Lib\site-packages\celery\worker\strategy.py", line 207, in task_message_handler
+    handle(req)
+    │      └ <Request: backend.tasks.process_pdf_task[6be5d5c1-3359-415c-8637-114a87ce78fd] (17, 'D:\FastAPI\social_media_api\backend\app\...
+    └ <bound method WorkController._process_task of <Worker: celery@ARUN (running)>>
+  File "D:\FastAPI\social_media_api\venv\Lib\site-packages\celery\worker\worker.py", line 225, in _process_task
+    req.execute_using_pool(self.pool)
+    │   │                  │    └ <celery.concurrency.solo.TaskPool object at 0x0000025ED8CED460>
+    │   │                  └ <Worker: celery@ARUN (running)>
+    │   └ <function create_request_cls.<locals>.Request.execute_using_pool at 0x0000025ED8D71DA0>
+    └ <Request: backend.tasks.process_pdf_task[6be5d5c1-3359-415c-8637-114a87ce78fd] (17, 'D:\FastAPI\social_media_api\backend\app\...
+  File "D:\FastAPI\social_media_api\venv\Lib\site-packages\celery\worker\request.py", line 754, in execute_using_pool
+    result = apply_async(
+             └ <bound method BasePool.apply_async of <celery.concurrency.solo.TaskPool object at 0x0000025ED8CED460>>
+  File "D:\FastAPI\social_media_api\venv\Lib\site-packages\celery\concurrency\base.py", line 153, in apply_async
+    return self.on_apply(target, args, kwargs,
+           │    │        │       │     └ {}
+           │    │        │       └ ('backend.tasks.process_pdf_task', '6be5d5c1-3359-415c-8637-114a87ce78fd', {'lang': 'py', 'task': 'backend.tasks.process_pdf_...
+           │    │        └ <function fast_trace_task at 0x0000025EB7B9EE80>
+           │    └ <function apply_target at 0x0000025EB7B9F1A0>
+           └ <celery.concurrency.solo.TaskPool object at 0x0000025ED8CED460>
+  File "D:\FastAPI\social_media_api\venv\Lib\site-packages\celery\concurrency\base.py", line 30, in apply_target
+    ret = target(*args, **kwargs)
+          │       │       └ {}
+          │       └ ('backend.tasks.process_pdf_task', '6be5d5c1-3359-415c-8637-114a87ce78fd', {'lang': 'py', 'task': 'backend.tasks.process_pdf_...
+          └ <function fast_trace_task at 0x0000025EB7B9EE80>
+  File "D:\FastAPI\social_media_api\venv\Lib\site-packages\celery\app\trace.py", line 675, in fast_trace_task
+    R, I, T, Rstr = tasks[task].__trace__(
+                    │     └ 'backend.tasks.process_pdf_task'
+                    └ {'celery.chord': <@task: celery.chord of pdf_processor at 0x25eb6ca1d60>, 'backend.tasks.process_pdf_task': <@task: backend.t...
+  File "D:\FastAPI\social_media_api\venv\Lib\site-packages\celery\app\trace.py", line 477, in trace_task
+    R = retval = fun(*args, **kwargs)
+                 │    │       └ {}
+                 │    └ [17, 'D:\\FastAPI\\social_media_api\\backend\\app\\utils\\../../uploads\\user_17\\20250908194411_Absolute Zero.pdf', 'Absolut...
+                 └ <@task: backend.tasks.process_pdf_task of pdf_processor at 0x25eb6ca1d60>
+  File "D:\FastAPI\social_media_api\venv\Lib\site-packages\celery\app\trace.py", line 760, in __protected_call__
+    return self.run(*args, **kwargs)
+           │    │    │       └ {}
+           │    │    └ (17, 'D:\\FastAPI\\social_media_api\\backend\\app\\utils\\../../uploads\\user_17\\20250908194411_Absolute Zero.pdf', 'Absolut...
+           │    └ <function process_pdf_task at 0x0000025EB7603D80>
+           └ <@task: backend.tasks.process_pdf_task of pdf_processor at 0x25eb6ca1d60>
+
+> File "D:\FastAPI\social_media_api\backend\tasks.py", line 23, in process_pdf_task
+    TaskService.update_task_status(task_id, 'processing', 'Starting PDF processing...')
+    │           │                  └ '6be5d5c1-3359-415c-8637-114a87ce78fd'
+    │           └ <staticmethod(<function TaskService.update_task_status at 0x0000025ED8C4BEC0>)>
+    └ <class 'backend.app.services.task_service.TaskService'>
+
+  File "D:\FastAPI\social_media_api\backend\app\services\task_service.py", line 93, in update_task_status
+    user_id = result[0]
+              └ RealDictRow({'user_id': 17})
+
+KeyError: 0
+2025-09-08 19:46:17 | INFO     | CELERY | Starting PDF processing task for user 17
+2025-09-08 19:46:17 | INFO     | CELERY | Task ID: 37c403ea-6527-41b2-811a-4af914fc6f4c
+2025-09-08 19:46:17 | INFO     | CELERY | File: Absolute Zero.pdf
+2025-09-08 19:46:17 | INFO     | CELERY | Path: D:\FastAPI\social_media_api\backend\app\utils\../../uploads\user_17\20250908194617_Absolute Zero.pdf
+2025-09-08 19:46:17 | ERROR    | CELERY | Error in PDF processing task: 0
+2025-09-08 19:46:17 | ERROR    | CELERY | Full error traceback:
+Traceback (most recent call last):
+
+  File "D:\FastAPI\social_media_api\start_celery.py", line 42, in <module>
+    celery_app.worker_main([
+    │          └ <function Celery.worker_main at 0x0000021447D02AC0>
+    └ <Celery pdf_processor at 0x21446e83fb0>
+
+  File "D:\FastAPI\social_media_api\venv\Lib\site-packages\celery\app\base.py", line 388, in worker_main
+    self.start(argv=argv)
+    │    │          └ ['worker', '--loglevel=info', '--pool=solo', '--queues=pdf_processing', '--without-gossip', '--without-mingle', '--without-he...
+    │    └ <function Celery.start at 0x0000021447D02A20>
+    └ <Celery pdf_processor at 0x21446e83fb0>
+  File "D:\FastAPI\social_media_api\venv\Lib\site-packages\celery\app\base.py", line 368, in start
+    celery.main(args=argv, standalone_mode=False)
+    │      │         └ ['worker', '--loglevel=info', '--pool=solo', '--queues=pdf_processing', '--without-gossip', '--without-mingle', '--without-he...
+    │      └ <function BaseCommand.main at 0x00000214473C44A0>
+    └ <DYMGroup celery>
+  File "D:\FastAPI\social_media_api\venv\Lib\site-packages\click\core.py", line 1082, in main
+    rv = self.invoke(ctx)
+         │    │      └ <click.core.Context object at 0x0000021446ED4440>
+         │    └ <function MultiCommand.invoke at 0x00000214473C56C0>
+         └ <DYMGroup celery>
+  File "D:\FastAPI\social_media_api\venv\Lib\site-packages\click\core.py", line 1697, in invoke
+    return _process_result(sub_ctx.command.invoke(sub_ctx))
+           │               │       │       │      └ <click.core.Context object at 0x00000214484B5E20>
+           │               │       │       └ <function Command.invoke at 0x00000214473C5080>
+           │               │       └ <CeleryDaemonCommand worker>
+           │               └ <click.core.Context object at 0x00000214484B5E20>
+           └ <function MultiCommand.invoke.<locals>._process_result at 0x0000021447484540>
+  File "D:\FastAPI\social_media_api\venv\Lib\site-packages\click\core.py", line 1443, in invoke
+    return ctx.invoke(self.callback, **ctx.params)
+           │   │      │    │           │   └ {'loglevel': 20, 'pool': <class 'celery.concurrency.solo.TaskPool'>, 'queues': ['pdf_processing'], 'without_gossip': True, 'w...
+           │   │      │    │           └ <click.core.Context object at 0x00000214484B5E20>
+           │   │      │    └ <function worker at 0x0000021448342E80>
+           │   │      └ <CeleryDaemonCommand worker>
+           │   └ <function Context.invoke at 0x00000214473B79C0>
+           └ <click.core.Context object at 0x00000214484B5E20>
+  File "D:\FastAPI\social_media_api\venv\Lib\site-packages\click\core.py", line 788, in invoke
+    return __callback(*args, **kwargs)
+                       │       └ {'loglevel': 20, 'pool': <class 'celery.concurrency.solo.TaskPool'>, 'queues': ['pdf_processing'], 'without_gossip': True, 'w...
+                       └ ()
+  File "D:\FastAPI\social_media_api\venv\Lib\site-packages\click\decorators.py", line 33, in new_func
+    return f(get_current_context(), *args, **kwargs)
+           │ │                       │       └ {'loglevel': 20, 'pool': <class 'celery.concurrency.solo.TaskPool'>, 'queues': ['pdf_processing'], 'without_gossip': True, 'w...
+           │ │                       └ ()
+           │ └ <function get_current_context at 0x0000021447382B60>
+           └ <function worker at 0x0000021448342DE0>
+  File "D:\FastAPI\social_media_api\venv\Lib\site-packages\celery\bin\base.py", line 134, in caller
+    return f(ctx, *args, **kwargs)
+           │ │     │       └ {'loglevel': 20, 'pool': <class 'celery.concurrency.solo.TaskPool'>, 'queues': ['pdf_processing'], 'without_gossip': True, 'w...
+           │ │     └ ()
+           │ └ <click.core.Context object at 0x00000214484B5E20>
+           └ <function worker at 0x0000021448342D40>
+  File "D:\FastAPI\social_media_api\venv\Lib\site-packages\celery\bin\worker.py", line 356, in worker
+    worker.start()
+    │      └ <function WorkController.start at 0x0000021448218680>
+    └ <Worker: celery@ARUN (running)>
+  File "D:\FastAPI\social_media_api\venv\Lib\site-packages\celery\worker\worker.py", line 202, in start
+    self.blueprint.start(self)
+    │    │         │     └ <Worker: celery@ARUN (running)>
+    │    │         └ <function Blueprint.start at 0x0000021448244360>
+    │    └ <celery.worker.worker.WorkController.Blueprint object at 0x00000214693C3170>
+    └ <Worker: celery@ARUN (running)>
+  File "D:\FastAPI\social_media_api\venv\Lib\site-packages\celery\bootsteps.py", line 116, in start
+    step.start(parent)
+    │    │     └ <Worker: celery@ARUN (running)>
+    │    └ <function StartStopStep.start at 0x0000021448245620>
+    └ <step: Consumer>
+  File "D:\FastAPI\social_media_api\venv\Lib\site-packages\celery\bootsteps.py", line 365, in start
+    return self.obj.start()
+           │    │   └ <function Consumer.start at 0x0000021469484D60>
+           │    └ <Consumer: celery@ARUN (running)>
+           └ <step: Consumer>
+  File "D:\FastAPI\social_media_api\venv\Lib\site-packages\celery\worker\consumer\consumer.py", line 340, in start
+    blueprint.start(self)
+    │         │     └ <Consumer: celery@ARUN (running)>
+    │         └ <function Blueprint.start at 0x0000021448244360>
+    └ <celery.worker.consumer.consumer.Consumer.Blueprint object at 0x000002146920EBA0>
+  File "D:\FastAPI\social_media_api\venv\Lib\site-packages\celery\bootsteps.py", line 116, in start
+    step.start(parent)
+    │    │     └ <Consumer: celery@ARUN (running)>
+    │    └ <function Evloop.start at 0x0000021469486020>
+    └ <step: event loop>
+  File "D:\FastAPI\social_media_api\venv\Lib\site-packages\celery\worker\consumer\consumer.py", line 742, in start
+    c.loop(*c.loop_args())
+    │ │     │ └ <function Consumer.loop_args at 0x0000021469485260>
+    │ │     └ <Consumer: celery@ARUN (running)>
+    │ └ <function synloop at 0x0000021469484540>
+    └ <Consumer: celery@ARUN (running)>
+  File "D:\FastAPI\social_media_api\venv\Lib\site-packages\celery\worker\loops.py", line 130, in synloop
+    connection.drain_events(timeout=2.0)
+    │          └ <function Connection.drain_events at 0x00000214471D7EC0>
+    └ <Connection: redis://localhost:6379/0 at 0x214694c7950>
+  File "D:\FastAPI\social_media_api\venv\Lib\site-packages\kombu\connection.py", line 341, in drain_events
+    return self.transport.drain_events(self.connection, **kwargs)
+           │    │                      │    │             └ {'timeout': 2.0}
+           │    │                      │    └ <property object at 0x0000021447204EA0>
+           │    │                      └ <Connection: redis://localhost:6379/0 at 0x214694c7950>
+           │    └ <property object at 0x0000021447205440>
+           └ <Connection: redis://localhost:6379/0 at 0x214694c7950>
+  File "D:\FastAPI\social_media_api\venv\Lib\site-packages\kombu\transport\virtual\base.py", line 997, in drain_events
+    get(self._deliver, timeout=timeout)
+    │   │    │                 └ 2.0
+    │   │    └ <function Transport._deliver at 0x00000214694547C0>
+    │   └ <kombu.transport.redis.Transport object at 0x00000214694C7A70>
+    └ <bound method MultiChannelPoller.get of <kombu.transport.redis.MultiChannelPoller object at 0x00000214694C7B00>>
+  File "D:\FastAPI\social_media_api\venv\Lib\site-packages\kombu\transport\redis.py", line 598, in get
+    ret = self.handle_event(fileno, event)
+          │    │            │       └ 1
+          │    │            └ 988
+          │    └ <function MultiChannelPoller.handle_event at 0x0000021469456CA0>
+          └ <kombu.transport.redis.MultiChannelPoller object at 0x00000214694C7B00>
+  File "D:\FastAPI\social_media_api\venv\Lib\site-packages\kombu\transport\redis.py", line 580, in handle_event
+    return self.on_readable(fileno), self
+           │    │           │        └ <kombu.transport.redis.MultiChannelPoller object at 0x00000214694C7B00>
+           │    │           └ 988
+           │    └ <function MultiChannelPoller.on_readable at 0x0000021469456C00>
+           └ <kombu.transport.redis.MultiChannelPoller object at 0x00000214694C7B00>
+  File "D:\FastAPI\social_media_api\venv\Lib\site-packages\kombu\transport\redis.py", line 576, in on_readable
+    chan.handlers[type]()
+    │    │        └ 'BRPOP'
+    │    └ {'BRPOP': <bound method Channel._brpop_read of <kombu.transport.redis.Channel object at 0x00000214694C7AD0>>, 'LISTEN': <boun...
+    └ <kombu.transport.redis.Channel object at 0x00000214694C7AD0>
+  File "D:\FastAPI\social_media_api\venv\Lib\site-packages\kombu\transport\redis.py", line 986, in _brpop_read
+    self.connection._deliver(loads(bytes_to_str(item)), dest)
+    │    │          │        │     │            │       └ 'pdf_processing'
+    │    │          │        │     │            └ b'{"body": "W1sxNywgIkQ6XFxGYXN0QVBJXFxzb2NpYWxfbWVkaWFfYXBpXFxiYWNrZW5kXFxhcHBcXHV0aWxzXFwuLi8uLi91cGxvYWRzXFx1c2VyXzE3XFwyM...
+    │    │          │        │     └ <function bytes_to_str at 0x000002144719A7A0>
+    │    │          │        └ <function loads at 0x0000021447214B80>
+    │    │          └ <function Transport._deliver at 0x00000214694547C0>
+    │    └ <kombu.transport.redis.Transport object at 0x00000214694C7A70>
+    └ <kombu.transport.redis.Channel object at 0x00000214694C7AD0>
+  File "D:\FastAPI\social_media_api\venv\Lib\site-packages\kombu\transport\virtual\base.py", line 1017, in _deliver
+    callback(message)
+    │        └ {'body': 'W1sxNywgIkQ6XFxGYXN0QVBJXFxzb2NpYWxfbWVkaWFfYXBpXFxiYWNrZW5kXFxhcHBcXHV0aWxzXFwuLi8uLi91cGxvYWRzXFx1c2VyXzE3XFwyMDI...
+    └ <function Channel.basic_consume.<locals>._callback at 0x00000214694F3D80>
+  File "D:\FastAPI\social_media_api\venv\Lib\site-packages\kombu\transport\virtual\base.py", line 639, in _callback
+    return callback(message)
+           │        └ <Message object at 0x21469422960 with details {'state': 'RECEIVED', 'content_type': 'application/json', 'delivery_tag': '8a72...
+           └ <bound method Consumer._receive_callback of <Consumer: [<Queue pdf_processing -> <Exchange pdf_processing(direct) bound to ch...
+  File "D:\FastAPI\social_media_api\venv\Lib\site-packages\kombu\messaging.py", line 668, in _receive_callback
+    return on_m(message) if on_m else self.receive(decoded, message)
+           │    │           │         │    │       │        └ <Message object at 0x21469422960 with details {'state': 'RECEIVED', 'content_type': 'application/json', 'delivery_tag': '8a72...
+           │    │           │         │    │       └ None
+           │    │           │         │    └ <function Consumer.receive at 0x00000214473FC2C0>
+           │    │           │         └ <Consumer: [<Queue pdf_processing -> <Exchange pdf_processing(direct) bound to chan:1> -> pdf_processing bound to chan:1>]>
+           │    │           └ <function Consumer.create_task_handler.<locals>.on_task_received at 0x00000214694F3C40>
+           │    └ <Message object at 0x21469422960 with details {'state': 'RECEIVED', 'content_type': 'application/json', 'delivery_tag': '8a72...
+           └ <function Consumer.create_task_handler.<locals>.on_task_received at 0x00000214694F3C40>
+  File "D:\FastAPI\social_media_api\venv\Lib\site-packages\celery\worker\consumer\consumer.py", line 684, in on_task_received
+    strategy(
+    └ <function default.<locals>.task_message_handler at 0x00000214694F1D00>
+  File "D:\FastAPI\social_media_api\venv\Lib\site-packages\celery\worker\strategy.py", line 207, in task_message_handler
+    handle(req)
+    │      └ <Request: backend.tasks.process_pdf_task[37c403ea-6527-41b2-811a-4af914fc6f4c] (17, 'D:\FastAPI\social_media_api\backend\app\...
+    └ <bound method WorkController._process_task of <Worker: celery@ARUN (running)>>
+  File "D:\FastAPI\social_media_api\venv\Lib\site-packages\celery\worker\worker.py", line 225, in _process_task
+    req.execute_using_pool(self.pool)
+    │   │                  │    └ <celery.concurrency.solo.TaskPool object at 0x0000021469469700>
+    │   │                  └ <Worker: celery@ARUN (running)>
+    │   └ <function create_request_cls.<locals>.Request.execute_using_pool at 0x00000214694F1DA0>
+    └ <Request: backend.tasks.process_pdf_task[37c403ea-6527-41b2-811a-4af914fc6f4c] (17, 'D:\FastAPI\social_media_api\backend\app\...
+  File "D:\FastAPI\social_media_api\venv\Lib\site-packages\celery\worker\request.py", line 754, in execute_using_pool
+    result = apply_async(
+             └ <bound method BasePool.apply_async of <celery.concurrency.solo.TaskPool object at 0x0000021469469700>>
+  File "D:\FastAPI\social_media_api\venv\Lib\site-packages\celery\concurrency\base.py", line 153, in apply_async
+    return self.on_apply(target, args, kwargs,
+           │    │        │       │     └ {}
+           │    │        │       └ ('backend.tasks.process_pdf_task', '37c403ea-6527-41b2-811a-4af914fc6f4c', {'lang': 'py', 'task': 'backend.tasks.process_pdf_...
+           │    │        └ <function fast_trace_task at 0x00000214482BEE80>
+           │    └ <function apply_target at 0x00000214482BF1A0>
+           └ <celery.concurrency.solo.TaskPool object at 0x0000021469469700>
+  File "D:\FastAPI\social_media_api\venv\Lib\site-packages\celery\concurrency\base.py", line 30, in apply_target
+    ret = target(*args, **kwargs)
+          │       │       └ {}
+          │       └ ('backend.tasks.process_pdf_task', '37c403ea-6527-41b2-811a-4af914fc6f4c', {'lang': 'py', 'task': 'backend.tasks.process_pdf_...
+          └ <function fast_trace_task at 0x00000214482BEE80>
+  File "D:\FastAPI\social_media_api\venv\Lib\site-packages\celery\app\trace.py", line 675, in fast_trace_task
+    R, I, T, Rstr = tasks[task].__trace__(
+                    │     └ 'backend.tasks.process_pdf_task'
+                    └ {'celery.chord': <@task: celery.chord of pdf_processor at 0x21446e83fb0>, 'backend.tasks.process_pdf_task': <@task: backend.t...
+  File "D:\FastAPI\social_media_api\venv\Lib\site-packages\celery\app\trace.py", line 477, in trace_task
+    R = retval = fun(*args, **kwargs)
+                 │    │       └ {}
+                 │    └ [17, 'D:\\FastAPI\\social_media_api\\backend\\app\\utils\\../../uploads\\user_17\\20250908194617_Absolute Zero.pdf', 'Absolut...
+                 └ <@task: backend.tasks.process_pdf_task of pdf_processor at 0x21446e83fb0>
+  File "D:\FastAPI\social_media_api\venv\Lib\site-packages\celery\app\trace.py", line 760, in __protected_call__
+    return self.run(*args, **kwargs)
+           │    │    │       └ {}
+           │    │    └ (17, 'D:\\FastAPI\\social_media_api\\backend\\app\\utils\\../../uploads\\user_17\\20250908194617_Absolute Zero.pdf', 'Absolut...
+           │    └ <function process_pdf_task at 0x0000021447D13D80>
+           └ <@task: backend.tasks.process_pdf_task of pdf_processor at 0x21446e83fb0>
+
+> File "D:\FastAPI\social_media_api\backend\tasks.py", line 23, in process_pdf_task
+    TaskService.update_task_status(task_id, 'processing', 'Starting PDF processing...')
+    │           │                  └ '37c403ea-6527-41b2-811a-4af914fc6f4c'
+    │           └ <staticmethod(<function TaskService.update_task_status at 0x00000214693CBEC0>)>
+    └ <class 'backend.app.services.task_service.TaskService'>
+
+  File "D:\FastAPI\social_media_api\backend\app\services\task_service.py", line 93, in update_task_status
+    user_id = result[0]
+              └ RealDictRow({'user_id': 17})
+
+KeyError: 0
+2025-09-08 19:48:48 | INFO     | CELERY | Starting PDF processing task for user 17
+2025-09-08 19:48:48 | INFO     | CELERY | Task ID: 618de696-95d1-4f0b-8166-78bfab6f2916
+2025-09-08 19:48:48 | INFO     | CELERY | File: Absolute Zero.pdf
+2025-09-08 19:48:48 | INFO     | CELERY | Path: D:\FastAPI\social_media_api\backend\app\utils\../../uploads\user_17\20250908194848_Absolute Zero.pdf
+2025-09-08 19:48:48 | INFO     | CELERY | 🤖 Initializing embeddings model for the first time - this may take a few minutes...
+2025-09-08 19:48:48 | INFO     | CELERY | 📥 Downloading/loading BAAI/bge-small-en-v1.5 model...
+2025-09-08 19:48:59 | SUCCESS  | CELERY | ✅ Embeddings model loaded successfully - subsequent uploads will be faster!
+2025-09-08 19:48:59 | INFO     | CELERY | Loading and extracting text from PDF...
+2025-09-08 19:49:01 | SUCCESS  | CELERY | PDF text extracted successfully - 178872 characters
+2025-09-08 19:49:01 | INFO     | CELERY | Splitting text into chunks...
+2025-09-08 19:49:01 | SUCCESS  | CELERY | Text split into 235 chunks
+2025-09-08 19:49:01 | INFO     | CELERY | Creating embeddings...
+2025-09-08 19:49:21 | SUCCESS  | CELERY | Vector store created with 235 vectors
+2025-09-08 19:49:21 | INFO     | CELERY | Saving vector store...
+2025-09-08 19:49:21 | SUCCESS  | CELERY |  Vector store saved to: D:\FastAPI\social_media_api\backend\app\services\../../vector_stores\user_17\current_pdf
+2025-09-08 19:49:21 | INFO     | CELERY | Finalizing database update...
+2025-09-08 19:49:21 | SUCCESS  | CELERY | PDF processing completed successfully for user 17
+2025-09-08 19:49:21 | INFO     | CELERY | Final stats: 235 vectors, 235 chunks
+2025-09-08 20:14:10 | INFO     | CELERY | Starting PDF processing task for user 29
+2025-09-08 20:14:10 | INFO     | CELERY | Task ID: a0ff55ca-9028-4bf0-9644-488dea8c5e0c
+2025-09-08 20:14:10 | INFO     | CELERY | File: kv_resume_iter_2 (1).pdf
+2025-09-08 20:14:10 | INFO     | CELERY | Path: D:\FastAPI\social_media_api\backend\app\utils\../../uploads\user_29\20250908201410_kv_resume_iter_2 (1).pdf
+2025-09-08 20:14:10 | INFO     | CELERY | ⚡ Using cached embeddings model - fast loading!
+2025-09-08 20:14:12 | INFO     | CELERY | Loading and extracting text from PDF...
+2025-09-08 20:14:13 | SUCCESS  | CELERY | PDF text extracted successfully - 5685 characters
+2025-09-08 20:14:13 | INFO     | CELERY | Splitting text into chunks...
+2025-09-08 20:14:13 | SUCCESS  | CELERY | Text split into 7 chunks
+2025-09-08 20:14:13 | INFO     | CELERY | Creating embeddings...
+2025-09-08 20:14:17 | SUCCESS  | CELERY | Vector store created with 7 vectors
+2025-09-08 20:14:17 | INFO     | CELERY | Saving vector store...
+2025-09-08 20:14:17 | SUCCESS  | CELERY |  Vector store saved to: D:\FastAPI\social_media_api\backend\app\services\../../vector_stores\user_29\current_pdf
+2025-09-08 20:14:17 | INFO     | CELERY | Finalizing database update...
+2025-09-08 20:14:17 | SUCCESS  | CELERY | PDF processing completed successfully for user 29
+2025-09-08 20:14:17 | INFO     | CELERY | Final stats: 7 vectors, 7 chunks
+2025-09-08 23:14:07 | INFO     | CELERY | Starting PDF processing task for user 17
+2025-09-08 23:14:07 | INFO     | CELERY | Task ID: 2cdec097-6301-49e2-a421-e8e887ecb850
+2025-09-08 23:14:07 | INFO     | CELERY | File: Absolute Zero.pdf
+2025-09-08 23:14:07 | INFO     | CELERY | Path: D:\FastAPI\social_media_api\backend\app\utils\../../uploads\user_17\20250908231407_Absolute Zero.pdf
+2025-09-08 23:14:07 | INFO     | CELERY | 🤖 Initializing embeddings model for the first time - this may take a few minutes...
+2025-09-08 23:14:07 | INFO     | CELERY | 📥 Downloading/loading BAAI/bge-small-en-v1.5 model...
+2025-09-08 23:14:36 | SUCCESS  | CELERY | ✅ Embeddings model loaded successfully - subsequent uploads will be faster!
+2025-09-08 23:14:38 | INFO     | CELERY | Loading and extracting text from PDF...
+2025-09-08 23:14:45 | SUCCESS  | CELERY | PDF text extracted successfully - 178872 characters
+2025-09-08 23:14:45 | INFO     | CELERY | Splitting text into chunks...
+2025-09-08 23:14:45 | SUCCESS  | CELERY | Text split into 235 chunks
+2025-09-08 23:14:45 | INFO     | CELERY | Creating embeddings...
+2025-09-08 23:15:46 | SUCCESS  | CELERY | Vector store created with 235 vectors
+2025-09-08 23:15:46 | INFO     | CELERY | Saving vector store...
+2025-09-08 23:15:47 | SUCCESS  | CELERY |  Vector store saved to: D:\FastAPI\social_media_api\backend\app\services\../../vector_stores\user_17\current_pdf
+2025-09-08 23:15:47 | INFO     | CELERY | Finalizing database update...
+2025-09-08 23:15:47 | SUCCESS  | CELERY | PDF processing completed successfully for user 17
+2025-09-08 23:15:47 | INFO     | CELERY | Final stats: 235 vectors, 235 chunks
