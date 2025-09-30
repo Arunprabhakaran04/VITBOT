@@ -57,6 +57,7 @@ celery_app.conf.update(
     worker_max_tasks_per_child=1,
     task_routes={
         "backend.tasks.process_pdf_task": {"queue": "pdf_processing"},
+        "backend.tasks.process_admin_pdf_task": {"queue": "pdf_processing"},
     },
     # Disable Celery's default logging
     worker_log_format="",

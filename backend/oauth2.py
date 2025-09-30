@@ -25,9 +25,10 @@ def verify_access_token(token:str, credentials_exception):
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         id : int = payload.get("user_id")
         email:str = payload.get("email")
+        role:str = payload.get("role", "user")
         if email is None or id is None:
             raise credentials_exception
-        token_data = TokenData(id = id, email = email)
+        token_data = TokenData(id = id, email = email, role = role)
     except PyJWTError:
         raise credentials_exception
     return token_data
@@ -36,3 +37,31 @@ def get_current_user(token : str = Depends(oauth2_scheme)):
     credential_exception = HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail = "unauthorized user")
     
     return verify_access_token(token, credential_exception)
+
+def get_current_admin_user(token : str = Depends(oauth2_scheme)):
+    """Get current user and verify admin role"""
+    credential_exception = HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail = "unauthorized user")
+    user_data = verify_access_token(token, credential_exception)
+    
+    if user_data.role != 'admin':
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN, 
+            detail="Admin access required"
+        )
+    
+    return user_data
+
+def require_role(required_role: str):
+    """Decorator to require specific role"""
+    def role_checker(token: str = Depends(oauth2_scheme)):
+        credential_exception = HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail = "unauthorized user")
+        user_data = verify_access_token(token, credential_exception)
+        
+        if user_data.role != required_role:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail=f"Role '{required_role}' required"
+            )
+        return user_data
+    
+    return role_checker

@@ -28,13 +28,14 @@ class EnhancedPDFExtractor:
                 page_text = page.get_text()
                 
                 if page_text:
-                    text += page_text + "\n"
+                    cleaned_page_text = self._clean_text(page_text)
+                    text += cleaned_page_text + "\n"
                     logger.debug(f"Extracted {len(page_text)} characters from page {page_num + 1}")
             
             doc.close()
             
             logger.info(f"Successfully extracted {len(text)} characters from {page_count} pages")
-            return text.strip()
+            return self._clean_text(text.strip())
             
         except Exception as e:
             logger.error(f"Error extracting text from PDF {pdf_path}: {e}")
@@ -59,8 +60,11 @@ class EnhancedPDFExtractor:
                 page_text = page.get_text()
                 
                 if page_text and page_text.strip():  # Only include pages with actual content
+                    # Clean the text to remove null bytes and problematic characters
+                    cleaned_text = self._clean_text(page_text.strip())
+                    
                     page_info = {
-                        'text': page_text.strip(),
+                        'text': cleaned_text,
                         'metadata': {
                             'source': filename,
                             'page': page_num + 1,  # 1-indexed page numbers
@@ -80,6 +84,25 @@ class EnhancedPDFExtractor:
             logger.error(f"Error extracting text with page info from PDF {pdf_path}: {e}")
             raise e
     
+    def _clean_text(self, text: str) -> str:
+        """
+        Clean text to remove null bytes and other problematic characters
+        that can cause PostgreSQL insertion errors
+        """
+        if not text:
+            return text
+        
+        # Remove null bytes and other problematic characters
+        cleaned_text = text.replace('\x00', '').replace('\0', '')
+        
+        # Remove other control characters except common whitespace
+        cleaned_text = ''.join(
+            char for char in cleaned_text 
+            if ord(char) >= 32 or char in '\t\n\r'
+        )
+        
+        return cleaned_text
+
     def get_text_preview(self, text: str, max_chars: int = 200) -> str:
         """
         Get a preview of the extracted text for logging

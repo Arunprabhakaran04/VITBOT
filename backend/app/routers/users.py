@@ -55,6 +55,14 @@ async def login_user(userdata : UserLogin):
         if not verify(userdata.password, user["password"]):
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail = "password incorrect")
         else:
-            access_token = create_access_token(data = {"user_id" : user["id"], "email" : user["email"]})
-            return {"access_token":  access_token, "token_type" : "bearer"}
+            access_token = create_access_token(data = {
+                "user_id" : user["id"], 
+                "email" : user["email"],
+                "role" : user.get("role", "user")
+            })
+            return {
+                "access_token":  access_token, 
+                "token_type" : "bearer",
+                "role": user.get("role", "user")
+            }
     

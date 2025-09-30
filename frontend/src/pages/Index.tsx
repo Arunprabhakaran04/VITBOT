@@ -1,20 +1,27 @@
 import { useEffect } from 'react';
 import { motion } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
 import { useStore } from '@/lib/store';
 import { AuthContainer } from '@/components/auth/AuthContainer';
 import { ChatLayout } from '@/components/chat/ChatLayout';
 
 const Index = () => {
-  const { currentView, isAuthenticated, setCurrentView } = useStore();
+  const { currentView, isAuthenticated, user, setCurrentView } = useStore();
+  const navigate = useNavigate();
 
   useEffect(() => {
     // Set initial view based on authentication status
     if (isAuthenticated) {
+      // Redirect admin users to admin dashboard
+      if (user?.role === 'admin') {
+        navigate('/admin');
+        return;
+      }
       setCurrentView('chat');
     } else {
       setCurrentView('auth');
     }
-  }, [isAuthenticated, setCurrentView]);
+  }, [isAuthenticated, user, setCurrentView, navigate]);
 
   return (
     <div className="h-screen bg-background">

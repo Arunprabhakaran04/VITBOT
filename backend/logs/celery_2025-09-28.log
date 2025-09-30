@@ -1,0 +1,908 @@
+2025-09-28 02:21:25 | INFO     | CELERY | 🚀 Starting admin PDF processing task for document 1
+2025-09-28 02:21:25 | INFO     | CELERY | 📋 Task ID: 39cbc0a8-4fef-4b36-9421-d95dc6723d5a
+2025-09-28 02:21:25 | INFO     | CELERY | 📄 File: kv_resume_iter_2 (1).pdf
+2025-09-28 02:21:25 | INFO     | CELERY | 📂 Path: D:\VITBOT\backend\app\routers\../../uploads/admin_documents\20250927_220106_kv_resume_iter_2_(1).pdf
+2025-09-28 02:21:25 | ERROR    | CELERY | Error in admin PDF processing task: PDF file not found: D:\VITBOT\backend\app\routers\../../uploads/admin_documents\20250927_220106_kv_resume_iter_2_(1).pdf
+2025-09-28 02:21:25 | ERROR    | CELERY | Full admin task error traceback:
+Traceback (most recent call last):
+
+  File "D:\VITBOT\start_celery.py", line 42, in <module>
+    celery_app.worker_main([
+    │          └ <function Celery.worker_main at 0x000001DB626F6A20>
+    └ <Celery pdf_processor at 0x1db6201bbf0>
+
+  File "D:\VITBOT\venv\Lib\site-packages\celery\app\base.py", line 388, in worker_main
+    self.start(argv=argv)
+    │    │          └ ['worker', '--loglevel=info', '--pool=solo', '--queues=pdf_processing,celery', '--without-gossip', '--without-mingle', '--wit...
+    │    └ <function Celery.start at 0x000001DB626F6980>
+    └ <Celery pdf_processor at 0x1db6201bbf0>
+  File "D:\VITBOT\venv\Lib\site-packages\celery\app\base.py", line 368, in start
+    celery.main(args=argv, standalone_mode=False)
+    │      │         └ ['worker', '--loglevel=info', '--pool=solo', '--queues=pdf_processing,celery', '--without-gossip', '--without-mingle', '--wit...
+    │      └ <function Command.main at 0x000001DB625E9300>
+    └ <DYMGroup celery>
+  File "D:\VITBOT\venv\Lib\site-packages\click\core.py", line 1383, in main
+    rv = self.invoke(ctx)
+         │    │      └ <click.core.Context object at 0x000001DB601FF1D0>
+         │    └ <function Group.invoke at 0x000001DB625EA200>
+         └ <DYMGroup celery>
+  File "D:\VITBOT\venv\Lib\site-packages\click\core.py", line 1850, in invoke
+    return _process_result(sub_ctx.command.invoke(sub_ctx))
+           │               │       │       │      └ <click.core.Context object at 0x000001DB63562360>
+           │               │       │       └ <function Command.invoke at 0x000001DB625E8FE0>
+           │               │       └ <CeleryDaemonCommand worker>
+           │               └ <click.core.Context object at 0x000001DB63562360>
+           └ <function Group.invoke.<locals>._process_result at 0x000001DB6270FE20>
+  File "D:\VITBOT\venv\Lib\site-packages\click\core.py", line 1246, in invoke
+    return ctx.invoke(self.callback, **ctx.params)
+           │   │      │    │           │   └ {'loglevel': 20, 'pool': <class 'celery.concurrency.solo.TaskPool'>, 'queues': ['pdf_processing', 'celery'], 'without_gossip'...
+           │   │      │    │           └ <click.core.Context object at 0x000001DB63562360>
+           │   │      │    └ <function worker at 0x000001DB63551440>
+           │   │      └ <CeleryDaemonCommand worker>
+           │   └ <function Context.invoke at 0x000001DB625E8220>
+           └ <click.core.Context object at 0x000001DB63562360>
+  File "D:\VITBOT\venv\Lib\site-packages\click\core.py", line 814, in invoke
+    return callback(*args, **kwargs)
+           │         │       └ {'loglevel': 20, 'pool': <class 'celery.concurrency.solo.TaskPool'>, 'queues': ['pdf_processing', 'celery'], 'without_gossip'...
+           │         └ ()
+           └ <function worker at 0x000001DB63551440>
+  File "D:\VITBOT\venv\Lib\site-packages\click\decorators.py", line 34, in new_func
+    return f(get_current_context(), *args, **kwargs)
+           │ │                       │       └ {'loglevel': 20, 'pool': <class 'celery.concurrency.solo.TaskPool'>, 'queues': ['pdf_processing', 'celery'], 'without_gossip'...
+           │ │                       └ ()
+           │ └ <function get_current_context at 0x000001DB625B6840>
+           └ <function worker at 0x000001DB635513A0>
+  File "D:\VITBOT\venv\Lib\site-packages\celery\bin\base.py", line 134, in caller
+    return f(ctx, *args, **kwargs)
+           │ │     │       └ {'loglevel': 20, 'pool': <class 'celery.concurrency.solo.TaskPool'>, 'queues': ['pdf_processing', 'celery'], 'without_gossip'...
+           │ │     └ ()
+           │ └ <click.core.Context object at 0x000001DB63562360>
+           └ <function worker at 0x000001DB63551300>
+  File "D:\VITBOT\venv\Lib\site-packages\celery\bin\worker.py", line 356, in worker
+    worker.start()
+    │      └ <function WorkController.start at 0x000001DB6343E3E0>
+    └ <Worker: celery@ARUN (running)>
+  File "D:\VITBOT\venv\Lib\site-packages\celery\worker\worker.py", line 202, in start
+    self.blueprint.start(self)
+    │    │         │     └ <Worker: celery@ARUN (running)>
+    │    │         └ <function Blueprint.start at 0x000001DB6341A160>
+    │    └ <celery.worker.worker.WorkController.Blueprint object at 0x000001DB0B3B2630>
+    └ <Worker: celery@ARUN (running)>
+  File "D:\VITBOT\venv\Lib\site-packages\celery\bootsteps.py", line 116, in start
+    step.start(parent)
+    │    │     └ <Worker: celery@ARUN (running)>
+    │    └ <function StartStopStep.start at 0x000001DB6341B420>
+    └ <step: Consumer>
+  File "D:\VITBOT\venv\Lib\site-packages\celery\bootsteps.py", line 365, in start
+    return self.obj.start()
+           │    │   └ <function Consumer.start at 0x000001DB0E688D60>
+           │    └ <Consumer: celery@ARUN (running)>
+           └ <step: Consumer>
+  File "D:\VITBOT\venv\Lib\site-packages\celery\worker\consumer\consumer.py", line 340, in start
+    blueprint.start(self)
+    │         │     └ <Consumer: celery@ARUN (running)>
+    │         └ <function Blueprint.start at 0x000001DB6341A160>
+    └ <celery.worker.consumer.consumer.Consumer.Blueprint object at 0x000001DB0E66ABA0>
+  File "D:\VITBOT\venv\Lib\site-packages\celery\bootsteps.py", line 116, in start
+    step.start(parent)
+    │    │     └ <Consumer: celery@ARUN (running)>
+    │    └ <function Evloop.start at 0x000001DB0E68A020>
+    └ <step: event loop>
+  File "D:\VITBOT\venv\Lib\site-packages\celery\worker\consumer\consumer.py", line 742, in start
+    c.loop(*c.loop_args())
+    │ │     │ └ <function Consumer.loop_args at 0x000001DB0E689260>
+    │ │     └ <Consumer: celery@ARUN (running)>
+    │ └ <function synloop at 0x000001DB0E688540>
+    └ <Consumer: celery@ARUN (running)>
+  File "D:\VITBOT\venv\Lib\site-packages\celery\worker\loops.py", line 130, in synloop
+    connection.drain_events(timeout=2.0)
+    │          └ <function Connection.drain_events at 0x000001DB623277E0>
+    └ <Connection: redis://localhost:6379/0 at 0x1db0e6c1520>
+  File "D:\VITBOT\venv\Lib\site-packages\kombu\connection.py", line 341, in drain_events
+    return self.transport.drain_events(self.connection, **kwargs)
+           │    │                      │    │             └ {'timeout': 2.0}
+           │    │                      │    └ <property object at 0x000001DB6233F5B0>
+           │    │                      └ <Connection: redis://localhost:6379/0 at 0x1db0e6c1520>
+           │    └ <property object at 0x000001DB6233FB50>
+           └ <Connection: redis://localhost:6379/0 at 0x1db0e6c1520>
+  File "D:\VITBOT\venv\Lib\site-packages\kombu\transport\virtual\base.py", line 997, in drain_events
+    get(self._deliver, timeout=timeout)
+    │   │    │                 └ 2.0
+    │   │    └ <function Transport._deliver at 0x000001DB0E66CE00>
+    │   └ <kombu.transport.redis.Transport object at 0x000001DB0E6C2FC0>
+    └ <bound method MultiChannelPoller.get of <kombu.transport.redis.MultiChannelPoller object at 0x000001DB0E6C22A0>>
+  File "D:\VITBOT\venv\Lib\site-packages\kombu\transport\redis.py", line 598, in get
+    ret = self.handle_event(fileno, event)
+          │    │            │       └ 1
+          │    │            └ 2068
+          │    └ <function MultiChannelPoller.handle_event at 0x000001DB0E66F2E0>
+          └ <kombu.transport.redis.MultiChannelPoller object at 0x000001DB0E6C22A0>
+  File "D:\VITBOT\venv\Lib\site-packages\kombu\transport\redis.py", line 580, in handle_event
+    return self.on_readable(fileno), self
+           │    │           │        └ <kombu.transport.redis.MultiChannelPoller object at 0x000001DB0E6C22A0>
+           │    │           └ 2068
+           │    └ <function MultiChannelPoller.on_readable at 0x000001DB0E66F240>
+           └ <kombu.transport.redis.MultiChannelPoller object at 0x000001DB0E6C22A0>
+  File "D:\VITBOT\venv\Lib\site-packages\kombu\transport\redis.py", line 576, in on_readable
+    chan.handlers[type]()
+    │    │        └ 'BRPOP'
+    │    └ {'BRPOP': <bound method Channel._brpop_read of <kombu.transport.redis.Channel object at 0x000001DB0E6C11F0>>, 'LISTEN': <boun...
+    └ <kombu.transport.redis.Channel object at 0x000001DB0E6C11F0>
+  File "D:\VITBOT\venv\Lib\site-packages\kombu\transport\redis.py", line 986, in _brpop_read
+    self.connection._deliver(loads(bytes_to_str(item)), dest)
+    │    │          │        │     │            │       └ 'celery'
+    │    │          │        │     │            └ b'{"body": "W1sxLCAiRDpcXFZJVEJPVFxcYmFja2VuZFxcYXBwXFxyb3V0ZXJzXFwuLi8uLi91cGxvYWRzL2FkbWluX2RvY3VtZW50c1xcMjAyNTA5MjdfMjIwM...
+    │    │          │        │     └ <function bytes_to_str at 0x000001DB622D5F80>
+    │    │          │        └ <function loads at 0x000001DB623744A0>
+    │    │          └ <function Transport._deliver at 0x000001DB0E66CE00>
+    │    └ <kombu.transport.redis.Transport object at 0x000001DB0E6C2FC0>
+    └ <kombu.transport.redis.Channel object at 0x000001DB0E6C11F0>
+  File "D:\VITBOT\venv\Lib\site-packages\kombu\transport\virtual\base.py", line 1017, in _deliver
+    callback(message)
+    │        └ {'body': 'W1sxLCAiRDpcXFZJVEJPVFxcYmFja2VuZFxcYXBwXFxyb3V0ZXJzXFwuLi8uLi91cGxvYWRzL2FkbWluX2RvY3VtZW50c1xcMjAyNTA5MjdfMjIwMTA...
+    └ <function Channel.basic_consume.<locals>._callback at 0x000001DB0E6FB9C0>
+  File "D:\VITBOT\venv\Lib\site-packages\kombu\transport\virtual\base.py", line 639, in _callback
+    return callback(message)
+           │        └ <Message object at 0x1db0e6a4e60 with details {'state': 'RECEIVED', 'content_type': 'application/json', 'delivery_tag': 'fe78...
+           └ <bound method Consumer._receive_callback of <Consumer: [<Queue pdf_processing -> <Exchange pdf_processing(direct) bound to ch...
+  File "D:\VITBOT\venv\Lib\site-packages\kombu\messaging.py", line 668, in _receive_callback
+    return on_m(message) if on_m else self.receive(decoded, message)
+           │    │           │         │    │       │        └ <Message object at 0x1db0e6a4e60 with details {'state': 'RECEIVED', 'content_type': 'application/json', 'delivery_tag': 'fe78...
+           │    │           │         │    │       └ None
+           │    │           │         │    └ <function Consumer.receive at 0x000001DB6260C400>
+           │    │           │         └ <Consumer: [<Queue pdf_processing -> <Exchange pdf_processing(direct) bound to chan:1> -> pdf_processing bound to chan:1>, <Q...
+           │    │           └ <function Consumer.create_task_handler.<locals>.on_task_received at 0x000001DB0E6FB7E0>
+           │    └ <Message object at 0x1db0e6a4e60 with details {'state': 'RECEIVED', 'content_type': 'application/json', 'delivery_tag': 'fe78...
+           └ <function Consumer.create_task_handler.<locals>.on_task_received at 0x000001DB0E6FB7E0>
+  File "D:\VITBOT\venv\Lib\site-packages\celery\worker\consumer\consumer.py", line 684, in on_task_received
+    strategy(
+    └ <function default.<locals>.task_message_handler at 0x000001DB0E6F9B20>
+  File "D:\VITBOT\venv\Lib\site-packages\celery\worker\strategy.py", line 207, in task_message_handler
+    handle(req)
+    │      └ <Request: backend.tasks.process_admin_pdf_task[39cbc0a8-4fef-4b36-9421-d95dc6723d5a] (1, 'D:\VITBOT\backend\app\routers\../.....
+    └ <bound method WorkController._process_task of <Worker: celery@ARUN (running)>>
+  File "D:\VITBOT\venv\Lib\site-packages\celery\worker\worker.py", line 225, in _process_task
+    req.execute_using_pool(self.pool)
+    │   │                  │    └ <celery.concurrency.solo.TaskPool object at 0x000001DB0E668E00>
+    │   │                  └ <Worker: celery@ARUN (running)>
+    │   └ <function create_request_cls.<locals>.Request.execute_using_pool at 0x000001DB0E6F9BC0>
+    └ <Request: backend.tasks.process_admin_pdf_task[39cbc0a8-4fef-4b36-9421-d95dc6723d5a] (1, 'D:\VITBOT\backend\app\routers\../.....
+  File "D:\VITBOT\venv\Lib\site-packages\celery\worker\request.py", line 754, in execute_using_pool
+    result = apply_async(
+             └ <bound method BasePool.apply_async of <celery.concurrency.solo.TaskPool object at 0x000001DB0E668E00>>
+  File "D:\VITBOT\venv\Lib\site-packages\celery\concurrency\base.py", line 153, in apply_async
+    return self.on_apply(target, args, kwargs,
+           │    │        │       │     └ {}
+           │    │        │       └ ('backend.tasks.process_admin_pdf_task', '39cbc0a8-4fef-4b36-9421-d95dc6723d5a', {'lang': 'py', 'task': 'backend.tasks.proces...
+           │    │        └ <function fast_trace_task at 0x000001DB634B8C20>
+           │    └ <function apply_target at 0x000001DB634B8F40>
+           └ <celery.concurrency.solo.TaskPool object at 0x000001DB0E668E00>
+  File "D:\VITBOT\venv\Lib\site-packages\celery\concurrency\base.py", line 30, in apply_target
+    ret = target(*args, **kwargs)
+          │       │       └ {}
+          │       └ ('backend.tasks.process_admin_pdf_task', '39cbc0a8-4fef-4b36-9421-d95dc6723d5a', {'lang': 'py', 'task': 'backend.tasks.proces...
+          └ <function fast_trace_task at 0x000001DB634B8C20>
+  File "D:\VITBOT\venv\Lib\site-packages\celery\app\trace.py", line 675, in fast_trace_task
+    R, I, T, Rstr = tasks[task].__trace__(
+                    │     └ 'backend.tasks.process_admin_pdf_task'
+                    └ {'celery.group': <@task: celery.group of pdf_processor at 0x1db6201bbf0>, 'celery.map': <@task: celery.map of pdf_processor a...
+  File "D:\VITBOT\venv\Lib\site-packages\celery\app\trace.py", line 477, in trace_task
+    R = retval = fun(*args, **kwargs)
+                 │    │       └ {}
+                 │    └ [1, 'D:\\VITBOT\\backend\\app\\routers\\../../uploads/admin_documents\\20250927_220106_kv_resume_iter_2_(1).pdf', 'kv_resume_...
+                 └ <@task: backend.tasks.process_admin_pdf_task of pdf_processor at 0x1db6201bbf0>
+  File "D:\VITBOT\venv\Lib\site-packages\celery\app\trace.py", line 760, in __protected_call__
+    return self.run(*args, **kwargs)
+           │    │    │       └ {}
+           │    │    └ (1, 'D:\\VITBOT\\backend\\app\\routers\\../../uploads/admin_documents\\20250927_220106_kv_resume_iter_2_(1).pdf', 'kv_resume_...
+           │    └ <function process_admin_pdf_task at 0x000001DB0DE33CE0>
+           └ <@task: backend.tasks.process_admin_pdf_task of pdf_processor at 0x1db6201bbf0>
+
+> File "D:\VITBOT\backend\tasks.py", line 143, in process_admin_pdf_task
+    raise FileNotFoundError(f"PDF file not found: {file_path}")
+                                                   └ 'D:\\VITBOT\\backend\\app\\routers\\../../uploads/admin_documents\\20250927_220106_kv_resume_iter_2_(1).pdf'
+
+FileNotFoundError: PDF file not found: D:\VITBOT\backend\app\routers\../../uploads/admin_documents\20250927_220106_kv_resume_iter_2_(1).pdf
+2025-09-28 02:21:26 | INFO     | CELERY | 🚀 Starting admin PDF processing task for document 2
+2025-09-28 02:21:26 | INFO     | CELERY | 📋 Task ID: e2537123-87e6-4863-8531-becc7de31153
+2025-09-28 02:21:26 | INFO     | CELERY | 📄 File: research paper - whispering Llama.pdf
+2025-09-28 02:21:26 | INFO     | CELERY | 📂 Path: D:\VITBOT\backend\app\routers\../../uploads/admin_documents\20250927_220107_research_paper_-_whispering_Llama.pdf
+2025-09-28 02:21:26 | ERROR    | CELERY | Error in admin PDF processing task: PDF file not found: D:\VITBOT\backend\app\routers\../../uploads/admin_documents\20250927_220107_research_paper_-_whispering_Llama.pdf
+2025-09-28 02:21:26 | ERROR    | CELERY | Full admin task error traceback:
+Traceback (most recent call last):
+
+  File "D:\VITBOT\start_celery.py", line 42, in <module>
+    celery_app.worker_main([
+    │          └ <function Celery.worker_main at 0x000001DB626F6A20>
+    └ <Celery pdf_processor at 0x1db6201bbf0>
+
+  File "D:\VITBOT\venv\Lib\site-packages\celery\app\base.py", line 388, in worker_main
+    self.start(argv=argv)
+    │    │          └ ['worker', '--loglevel=info', '--pool=solo', '--queues=pdf_processing,celery', '--without-gossip', '--without-mingle', '--wit...
+    │    └ <function Celery.start at 0x000001DB626F6980>
+    └ <Celery pdf_processor at 0x1db6201bbf0>
+  File "D:\VITBOT\venv\Lib\site-packages\celery\app\base.py", line 368, in start
+    celery.main(args=argv, standalone_mode=False)
+    │      │         └ ['worker', '--loglevel=info', '--pool=solo', '--queues=pdf_processing,celery', '--without-gossip', '--without-mingle', '--wit...
+    │      └ <function Command.main at 0x000001DB625E9300>
+    └ <DYMGroup celery>
+  File "D:\VITBOT\venv\Lib\site-packages\click\core.py", line 1383, in main
+    rv = self.invoke(ctx)
+         │    │      └ <click.core.Context object at 0x000001DB601FF1D0>
+         │    └ <function Group.invoke at 0x000001DB625EA200>
+         └ <DYMGroup celery>
+  File "D:\VITBOT\venv\Lib\site-packages\click\core.py", line 1850, in invoke
+    return _process_result(sub_ctx.command.invoke(sub_ctx))
+           │               │       │       │      └ <click.core.Context object at 0x000001DB63562360>
+           │               │       │       └ <function Command.invoke at 0x000001DB625E8FE0>
+           │               │       └ <CeleryDaemonCommand worker>
+           │               └ <click.core.Context object at 0x000001DB63562360>
+           └ <function Group.invoke.<locals>._process_result at 0x000001DB6270FE20>
+  File "D:\VITBOT\venv\Lib\site-packages\click\core.py", line 1246, in invoke
+    return ctx.invoke(self.callback, **ctx.params)
+           │   │      │    │           │   └ {'loglevel': 20, 'pool': <class 'celery.concurrency.solo.TaskPool'>, 'queues': ['pdf_processing', 'celery'], 'without_gossip'...
+           │   │      │    │           └ <click.core.Context object at 0x000001DB63562360>
+           │   │      │    └ <function worker at 0x000001DB63551440>
+           │   │      └ <CeleryDaemonCommand worker>
+           │   └ <function Context.invoke at 0x000001DB625E8220>
+           └ <click.core.Context object at 0x000001DB63562360>
+  File "D:\VITBOT\venv\Lib\site-packages\click\core.py", line 814, in invoke
+    return callback(*args, **kwargs)
+           │         │       └ {'loglevel': 20, 'pool': <class 'celery.concurrency.solo.TaskPool'>, 'queues': ['pdf_processing', 'celery'], 'without_gossip'...
+           │         └ ()
+           └ <function worker at 0x000001DB63551440>
+  File "D:\VITBOT\venv\Lib\site-packages\click\decorators.py", line 34, in new_func
+    return f(get_current_context(), *args, **kwargs)
+           │ │                       │       └ {'loglevel': 20, 'pool': <class 'celery.concurrency.solo.TaskPool'>, 'queues': ['pdf_processing', 'celery'], 'without_gossip'...
+           │ │                       └ ()
+           │ └ <function get_current_context at 0x000001DB625B6840>
+           └ <function worker at 0x000001DB635513A0>
+  File "D:\VITBOT\venv\Lib\site-packages\celery\bin\base.py", line 134, in caller
+    return f(ctx, *args, **kwargs)
+           │ │     │       └ {'loglevel': 20, 'pool': <class 'celery.concurrency.solo.TaskPool'>, 'queues': ['pdf_processing', 'celery'], 'without_gossip'...
+           │ │     └ ()
+           │ └ <click.core.Context object at 0x000001DB63562360>
+           └ <function worker at 0x000001DB63551300>
+  File "D:\VITBOT\venv\Lib\site-packages\celery\bin\worker.py", line 356, in worker
+    worker.start()
+    │      └ <function WorkController.start at 0x000001DB6343E3E0>
+    └ <Worker: celery@ARUN (running)>
+  File "D:\VITBOT\venv\Lib\site-packages\celery\worker\worker.py", line 202, in start
+    self.blueprint.start(self)
+    │    │         │     └ <Worker: celery@ARUN (running)>
+    │    │         └ <function Blueprint.start at 0x000001DB6341A160>
+    │    └ <celery.worker.worker.WorkController.Blueprint object at 0x000001DB0B3B2630>
+    └ <Worker: celery@ARUN (running)>
+  File "D:\VITBOT\venv\Lib\site-packages\celery\bootsteps.py", line 116, in start
+    step.start(parent)
+    │    │     └ <Worker: celery@ARUN (running)>
+    │    └ <function StartStopStep.start at 0x000001DB6341B420>
+    └ <step: Consumer>
+  File "D:\VITBOT\venv\Lib\site-packages\celery\bootsteps.py", line 365, in start
+    return self.obj.start()
+           │    │   └ <function Consumer.start at 0x000001DB0E688D60>
+           │    └ <Consumer: celery@ARUN (running)>
+           └ <step: Consumer>
+  File "D:\VITBOT\venv\Lib\site-packages\celery\worker\consumer\consumer.py", line 340, in start
+    blueprint.start(self)
+    │         │     └ <Consumer: celery@ARUN (running)>
+    │         └ <function Blueprint.start at 0x000001DB6341A160>
+    └ <celery.worker.consumer.consumer.Consumer.Blueprint object at 0x000001DB0E66ABA0>
+  File "D:\VITBOT\venv\Lib\site-packages\celery\bootsteps.py", line 116, in start
+    step.start(parent)
+    │    │     └ <Consumer: celery@ARUN (running)>
+    │    └ <function Evloop.start at 0x000001DB0E68A020>
+    └ <step: event loop>
+  File "D:\VITBOT\venv\Lib\site-packages\celery\worker\consumer\consumer.py", line 742, in start
+    c.loop(*c.loop_args())
+    │ │     │ └ <function Consumer.loop_args at 0x000001DB0E689260>
+    │ │     └ <Consumer: celery@ARUN (running)>
+    │ └ <function synloop at 0x000001DB0E688540>
+    └ <Consumer: celery@ARUN (running)>
+  File "D:\VITBOT\venv\Lib\site-packages\celery\worker\loops.py", line 130, in synloop
+    connection.drain_events(timeout=2.0)
+    │          └ <function Connection.drain_events at 0x000001DB623277E0>
+    └ <Connection: redis://localhost:6379/0 at 0x1db0e6c1520>
+  File "D:\VITBOT\venv\Lib\site-packages\kombu\connection.py", line 341, in drain_events
+    return self.transport.drain_events(self.connection, **kwargs)
+           │    │                      │    │             └ {'timeout': 2.0}
+           │    │                      │    └ <property object at 0x000001DB6233F5B0>
+           │    │                      └ <Connection: redis://localhost:6379/0 at 0x1db0e6c1520>
+           │    └ <property object at 0x000001DB6233FB50>
+           └ <Connection: redis://localhost:6379/0 at 0x1db0e6c1520>
+  File "D:\VITBOT\venv\Lib\site-packages\kombu\transport\virtual\base.py", line 997, in drain_events
+    get(self._deliver, timeout=timeout)
+    │   │    │                 └ 2.0
+    │   │    └ <function Transport._deliver at 0x000001DB0E66CE00>
+    │   └ <kombu.transport.redis.Transport object at 0x000001DB0E6C2FC0>
+    └ <bound method MultiChannelPoller.get of <kombu.transport.redis.MultiChannelPoller object at 0x000001DB0E6C22A0>>
+  File "D:\VITBOT\venv\Lib\site-packages\kombu\transport\redis.py", line 598, in get
+    ret = self.handle_event(fileno, event)
+          │    │            │       └ 1
+          │    │            └ 2068
+          │    └ <function MultiChannelPoller.handle_event at 0x000001DB0E66F2E0>
+          └ <kombu.transport.redis.MultiChannelPoller object at 0x000001DB0E6C22A0>
+  File "D:\VITBOT\venv\Lib\site-packages\kombu\transport\redis.py", line 580, in handle_event
+    return self.on_readable(fileno), self
+           │    │           │        └ <kombu.transport.redis.MultiChannelPoller object at 0x000001DB0E6C22A0>
+           │    │           └ 2068
+           │    └ <function MultiChannelPoller.on_readable at 0x000001DB0E66F240>
+           └ <kombu.transport.redis.MultiChannelPoller object at 0x000001DB0E6C22A0>
+  File "D:\VITBOT\venv\Lib\site-packages\kombu\transport\redis.py", line 576, in on_readable
+    chan.handlers[type]()
+    │    │        └ 'BRPOP'
+    │    └ {'BRPOP': <bound method Channel._brpop_read of <kombu.transport.redis.Channel object at 0x000001DB0E6C11F0>>, 'LISTEN': <boun...
+    └ <kombu.transport.redis.Channel object at 0x000001DB0E6C11F0>
+  File "D:\VITBOT\venv\Lib\site-packages\kombu\transport\redis.py", line 986, in _brpop_read
+    self.connection._deliver(loads(bytes_to_str(item)), dest)
+    │    │          │        │     │            │       └ 'celery'
+    │    │          │        │     │            └ b'{"body": "W1syLCAiRDpcXFZJVEJPVFxcYmFja2VuZFxcYXBwXFxyb3V0ZXJzXFwuLi8uLi91cGxvYWRzL2FkbWluX2RvY3VtZW50c1xcMjAyNTA5MjdfMjIwM...
+    │    │          │        │     └ <function bytes_to_str at 0x000001DB622D5F80>
+    │    │          │        └ <function loads at 0x000001DB623744A0>
+    │    │          └ <function Transport._deliver at 0x000001DB0E66CE00>
+    │    └ <kombu.transport.redis.Transport object at 0x000001DB0E6C2FC0>
+    └ <kombu.transport.redis.Channel object at 0x000001DB0E6C11F0>
+  File "D:\VITBOT\venv\Lib\site-packages\kombu\transport\virtual\base.py", line 1017, in _deliver
+    callback(message)
+    │        └ {'body': 'W1syLCAiRDpcXFZJVEJPVFxcYmFja2VuZFxcYXBwXFxyb3V0ZXJzXFwuLi8uLi91cGxvYWRzL2FkbWluX2RvY3VtZW50c1xcMjAyNTA5MjdfMjIwMTA...
+    └ <function Channel.basic_consume.<locals>._callback at 0x000001DB0E6FB9C0>
+  File "D:\VITBOT\venv\Lib\site-packages\kombu\transport\virtual\base.py", line 639, in _callback
+    return callback(message)
+           │        └ <Message object at 0x1db0e6a6060 with details {'state': 'RECEIVED', 'content_type': 'application/json', 'delivery_tag': 'a258...
+           └ <bound method Consumer._receive_callback of <Consumer: [<Queue pdf_processing -> <Exchange pdf_processing(direct) bound to ch...
+  File "D:\VITBOT\venv\Lib\site-packages\kombu\messaging.py", line 668, in _receive_callback
+    return on_m(message) if on_m else self.receive(decoded, message)
+           │    │           │         │    │       │        └ <Message object at 0x1db0e6a6060 with details {'state': 'RECEIVED', 'content_type': 'application/json', 'delivery_tag': 'a258...
+           │    │           │         │    │       └ None
+           │    │           │         │    └ <function Consumer.receive at 0x000001DB6260C400>
+           │    │           │         └ <Consumer: [<Queue pdf_processing -> <Exchange pdf_processing(direct) bound to chan:1> -> pdf_processing bound to chan:1>, <Q...
+           │    │           └ <function Consumer.create_task_handler.<locals>.on_task_received at 0x000001DB0E6FB7E0>
+           │    └ <Message object at 0x1db0e6a6060 with details {'state': 'RECEIVED', 'content_type': 'application/json', 'delivery_tag': 'a258...
+           └ <function Consumer.create_task_handler.<locals>.on_task_received at 0x000001DB0E6FB7E0>
+  File "D:\VITBOT\venv\Lib\site-packages\celery\worker\consumer\consumer.py", line 684, in on_task_received
+    strategy(
+    └ <function default.<locals>.task_message_handler at 0x000001DB0E6F9B20>
+  File "D:\VITBOT\venv\Lib\site-packages\celery\worker\strategy.py", line 207, in task_message_handler
+    handle(req)
+    │      └ <Request: backend.tasks.process_admin_pdf_task[e2537123-87e6-4863-8531-becc7de31153] (2, 'D:\VITBOT\backend\app\routers\../.....
+    └ <bound method WorkController._process_task of <Worker: celery@ARUN (running)>>
+  File "D:\VITBOT\venv\Lib\site-packages\celery\worker\worker.py", line 225, in _process_task
+    req.execute_using_pool(self.pool)
+    │   │                  │    └ <celery.concurrency.solo.TaskPool object at 0x000001DB0E668E00>
+    │   │                  └ <Worker: celery@ARUN (running)>
+    │   └ <function create_request_cls.<locals>.Request.execute_using_pool at 0x000001DB0E6F9BC0>
+    └ <Request: backend.tasks.process_admin_pdf_task[e2537123-87e6-4863-8531-becc7de31153] (2, 'D:\VITBOT\backend\app\routers\../.....
+  File "D:\VITBOT\venv\Lib\site-packages\celery\worker\request.py", line 754, in execute_using_pool
+    result = apply_async(
+             └ <bound method BasePool.apply_async of <celery.concurrency.solo.TaskPool object at 0x000001DB0E668E00>>
+  File "D:\VITBOT\venv\Lib\site-packages\celery\concurrency\base.py", line 153, in apply_async
+    return self.on_apply(target, args, kwargs,
+           │    │        │       │     └ {}
+           │    │        │       └ ('backend.tasks.process_admin_pdf_task', 'e2537123-87e6-4863-8531-becc7de31153', {'lang': 'py', 'task': 'backend.tasks.proces...
+           │    │        └ <function fast_trace_task at 0x000001DB634B8C20>
+           │    └ <function apply_target at 0x000001DB634B8F40>
+           └ <celery.concurrency.solo.TaskPool object at 0x000001DB0E668E00>
+  File "D:\VITBOT\venv\Lib\site-packages\celery\concurrency\base.py", line 30, in apply_target
+    ret = target(*args, **kwargs)
+          │       │       └ {}
+          │       └ ('backend.tasks.process_admin_pdf_task', 'e2537123-87e6-4863-8531-becc7de31153', {'lang': 'py', 'task': 'backend.tasks.proces...
+          └ <function fast_trace_task at 0x000001DB634B8C20>
+  File "D:\VITBOT\venv\Lib\site-packages\celery\app\trace.py", line 675, in fast_trace_task
+    R, I, T, Rstr = tasks[task].__trace__(
+                    │     └ 'backend.tasks.process_admin_pdf_task'
+                    └ {'celery.group': <@task: celery.group of pdf_processor at 0x1db6201bbf0>, 'celery.map': <@task: celery.map of pdf_processor a...
+  File "D:\VITBOT\venv\Lib\site-packages\celery\app\trace.py", line 477, in trace_task
+    R = retval = fun(*args, **kwargs)
+                 │    │       └ {}
+                 │    └ [2, 'D:\\VITBOT\\backend\\app\\routers\\../../uploads/admin_documents\\20250927_220107_research_paper_-_whispering_Llama.pdf'...
+                 └ <@task: backend.tasks.process_admin_pdf_task of pdf_processor at 0x1db6201bbf0>
+  File "D:\VITBOT\venv\Lib\site-packages\celery\app\trace.py", line 760, in __protected_call__
+    return self.run(*args, **kwargs)
+           │    │    │       └ {}
+           │    │    └ (2, 'D:\\VITBOT\\backend\\app\\routers\\../../uploads/admin_documents\\20250927_220107_research_paper_-_whispering_Llama.pdf'...
+           │    └ <function process_admin_pdf_task at 0x000001DB0DE33CE0>
+           └ <@task: backend.tasks.process_admin_pdf_task of pdf_processor at 0x1db6201bbf0>
+
+> File "D:\VITBOT\backend\tasks.py", line 143, in process_admin_pdf_task
+    raise FileNotFoundError(f"PDF file not found: {file_path}")
+                                                   └ 'D:\\VITBOT\\backend\\app\\routers\\../../uploads/admin_documents\\20250927_220107_research_paper_-_whispering_Llama.pdf'
+
+FileNotFoundError: PDF file not found: D:\VITBOT\backend\app\routers\../../uploads/admin_documents\20250927_220107_research_paper_-_whispering_Llama.pdf
+2025-09-28 02:21:26 | INFO     | CELERY | 🚀 Starting admin PDF processing task for document 1
+2025-09-28 02:21:26 | INFO     | CELERY | 📋 Task ID: 0126fb6c-c01e-4094-aa4e-9e0046af24f2
+2025-09-28 02:21:26 | INFO     | CELERY | 📄 File: kv_resume_iter_2 (1).pdf
+2025-09-28 02:21:26 | INFO     | CELERY | 📂 Path: D:\VITBOT\backend\app\routers\../../uploads/admin_documents\20250928_021541_kv_resume_iter_2_(1).pdf
+2025-09-28 02:21:26 | ERROR    | CELERY | Error in admin PDF processing task: PDF file not found: D:\VITBOT\backend\app\routers\../../uploads/admin_documents\20250928_021541_kv_resume_iter_2_(1).pdf
+2025-09-28 02:21:26 | ERROR    | CELERY | Full admin task error traceback:
+Traceback (most recent call last):
+
+  File "D:\VITBOT\start_celery.py", line 42, in <module>
+    celery_app.worker_main([
+    │          └ <function Celery.worker_main at 0x000001DB626F6A20>
+    └ <Celery pdf_processor at 0x1db6201bbf0>
+
+  File "D:\VITBOT\venv\Lib\site-packages\celery\app\base.py", line 388, in worker_main
+    self.start(argv=argv)
+    │    │          └ ['worker', '--loglevel=info', '--pool=solo', '--queues=pdf_processing,celery', '--without-gossip', '--without-mingle', '--wit...
+    │    └ <function Celery.start at 0x000001DB626F6980>
+    └ <Celery pdf_processor at 0x1db6201bbf0>
+  File "D:\VITBOT\venv\Lib\site-packages\celery\app\base.py", line 368, in start
+    celery.main(args=argv, standalone_mode=False)
+    │      │         └ ['worker', '--loglevel=info', '--pool=solo', '--queues=pdf_processing,celery', '--without-gossip', '--without-mingle', '--wit...
+    │      └ <function Command.main at 0x000001DB625E9300>
+    └ <DYMGroup celery>
+  File "D:\VITBOT\venv\Lib\site-packages\click\core.py", line 1383, in main
+    rv = self.invoke(ctx)
+         │    │      └ <click.core.Context object at 0x000001DB601FF1D0>
+         │    └ <function Group.invoke at 0x000001DB625EA200>
+         └ <DYMGroup celery>
+  File "D:\VITBOT\venv\Lib\site-packages\click\core.py", line 1850, in invoke
+    return _process_result(sub_ctx.command.invoke(sub_ctx))
+           │               │       │       │      └ <click.core.Context object at 0x000001DB63562360>
+           │               │       │       └ <function Command.invoke at 0x000001DB625E8FE0>
+           │               │       └ <CeleryDaemonCommand worker>
+           │               └ <click.core.Context object at 0x000001DB63562360>
+           └ <function Group.invoke.<locals>._process_result at 0x000001DB6270FE20>
+  File "D:\VITBOT\venv\Lib\site-packages\click\core.py", line 1246, in invoke
+    return ctx.invoke(self.callback, **ctx.params)
+           │   │      │    │           │   └ {'loglevel': 20, 'pool': <class 'celery.concurrency.solo.TaskPool'>, 'queues': ['pdf_processing', 'celery'], 'without_gossip'...
+           │   │      │    │           └ <click.core.Context object at 0x000001DB63562360>
+           │   │      │    └ <function worker at 0x000001DB63551440>
+           │   │      └ <CeleryDaemonCommand worker>
+           │   └ <function Context.invoke at 0x000001DB625E8220>
+           └ <click.core.Context object at 0x000001DB63562360>
+  File "D:\VITBOT\venv\Lib\site-packages\click\core.py", line 814, in invoke
+    return callback(*args, **kwargs)
+           │         │       └ {'loglevel': 20, 'pool': <class 'celery.concurrency.solo.TaskPool'>, 'queues': ['pdf_processing', 'celery'], 'without_gossip'...
+           │         └ ()
+           └ <function worker at 0x000001DB63551440>
+  File "D:\VITBOT\venv\Lib\site-packages\click\decorators.py", line 34, in new_func
+    return f(get_current_context(), *args, **kwargs)
+           │ │                       │       └ {'loglevel': 20, 'pool': <class 'celery.concurrency.solo.TaskPool'>, 'queues': ['pdf_processing', 'celery'], 'without_gossip'...
+           │ │                       └ ()
+           │ └ <function get_current_context at 0x000001DB625B6840>
+           └ <function worker at 0x000001DB635513A0>
+  File "D:\VITBOT\venv\Lib\site-packages\celery\bin\base.py", line 134, in caller
+    return f(ctx, *args, **kwargs)
+           │ │     │       └ {'loglevel': 20, 'pool': <class 'celery.concurrency.solo.TaskPool'>, 'queues': ['pdf_processing', 'celery'], 'without_gossip'...
+           │ │     └ ()
+           │ └ <click.core.Context object at 0x000001DB63562360>
+           └ <function worker at 0x000001DB63551300>
+  File "D:\VITBOT\venv\Lib\site-packages\celery\bin\worker.py", line 356, in worker
+    worker.start()
+    │      └ <function WorkController.start at 0x000001DB6343E3E0>
+    └ <Worker: celery@ARUN (running)>
+  File "D:\VITBOT\venv\Lib\site-packages\celery\worker\worker.py", line 202, in start
+    self.blueprint.start(self)
+    │    │         │     └ <Worker: celery@ARUN (running)>
+    │    │         └ <function Blueprint.start at 0x000001DB6341A160>
+    │    └ <celery.worker.worker.WorkController.Blueprint object at 0x000001DB0B3B2630>
+    └ <Worker: celery@ARUN (running)>
+  File "D:\VITBOT\venv\Lib\site-packages\celery\bootsteps.py", line 116, in start
+    step.start(parent)
+    │    │     └ <Worker: celery@ARUN (running)>
+    │    └ <function StartStopStep.start at 0x000001DB6341B420>
+    └ <step: Consumer>
+  File "D:\VITBOT\venv\Lib\site-packages\celery\bootsteps.py", line 365, in start
+    return self.obj.start()
+           │    │   └ <function Consumer.start at 0x000001DB0E688D60>
+           │    └ <Consumer: celery@ARUN (running)>
+           └ <step: Consumer>
+  File "D:\VITBOT\venv\Lib\site-packages\celery\worker\consumer\consumer.py", line 340, in start
+    blueprint.start(self)
+    │         │     └ <Consumer: celery@ARUN (running)>
+    │         └ <function Blueprint.start at 0x000001DB6341A160>
+    └ <celery.worker.consumer.consumer.Consumer.Blueprint object at 0x000001DB0E66ABA0>
+  File "D:\VITBOT\venv\Lib\site-packages\celery\bootsteps.py", line 116, in start
+    step.start(parent)
+    │    │     └ <Consumer: celery@ARUN (running)>
+    │    └ <function Evloop.start at 0x000001DB0E68A020>
+    └ <step: event loop>
+  File "D:\VITBOT\venv\Lib\site-packages\celery\worker\consumer\consumer.py", line 742, in start
+    c.loop(*c.loop_args())
+    │ │     │ └ <function Consumer.loop_args at 0x000001DB0E689260>
+    │ │     └ <Consumer: celery@ARUN (running)>
+    │ └ <function synloop at 0x000001DB0E688540>
+    └ <Consumer: celery@ARUN (running)>
+  File "D:\VITBOT\venv\Lib\site-packages\celery\worker\loops.py", line 130, in synloop
+    connection.drain_events(timeout=2.0)
+    │          └ <function Connection.drain_events at 0x000001DB623277E0>
+    └ <Connection: redis://localhost:6379/0 at 0x1db0e6c1520>
+  File "D:\VITBOT\venv\Lib\site-packages\kombu\connection.py", line 341, in drain_events
+    return self.transport.drain_events(self.connection, **kwargs)
+           │    │                      │    │             └ {'timeout': 2.0}
+           │    │                      │    └ <property object at 0x000001DB6233F5B0>
+           │    │                      └ <Connection: redis://localhost:6379/0 at 0x1db0e6c1520>
+           │    └ <property object at 0x000001DB6233FB50>
+           └ <Connection: redis://localhost:6379/0 at 0x1db0e6c1520>
+  File "D:\VITBOT\venv\Lib\site-packages\kombu\transport\virtual\base.py", line 997, in drain_events
+    get(self._deliver, timeout=timeout)
+    │   │    │                 └ 2.0
+    │   │    └ <function Transport._deliver at 0x000001DB0E66CE00>
+    │   └ <kombu.transport.redis.Transport object at 0x000001DB0E6C2FC0>
+    └ <bound method MultiChannelPoller.get of <kombu.transport.redis.MultiChannelPoller object at 0x000001DB0E6C22A0>>
+  File "D:\VITBOT\venv\Lib\site-packages\kombu\transport\redis.py", line 598, in get
+    ret = self.handle_event(fileno, event)
+          │    │            │       └ 1
+          │    │            └ 2068
+          │    └ <function MultiChannelPoller.handle_event at 0x000001DB0E66F2E0>
+          └ <kombu.transport.redis.MultiChannelPoller object at 0x000001DB0E6C22A0>
+  File "D:\VITBOT\venv\Lib\site-packages\kombu\transport\redis.py", line 580, in handle_event
+    return self.on_readable(fileno), self
+           │    │           │        └ <kombu.transport.redis.MultiChannelPoller object at 0x000001DB0E6C22A0>
+           │    │           └ 2068
+           │    └ <function MultiChannelPoller.on_readable at 0x000001DB0E66F240>
+           └ <kombu.transport.redis.MultiChannelPoller object at 0x000001DB0E6C22A0>
+  File "D:\VITBOT\venv\Lib\site-packages\kombu\transport\redis.py", line 576, in on_readable
+    chan.handlers[type]()
+    │    │        └ 'BRPOP'
+    │    └ {'BRPOP': <bound method Channel._brpop_read of <kombu.transport.redis.Channel object at 0x000001DB0E6C11F0>>, 'LISTEN': <boun...
+    └ <kombu.transport.redis.Channel object at 0x000001DB0E6C11F0>
+  File "D:\VITBOT\venv\Lib\site-packages\kombu\transport\redis.py", line 986, in _brpop_read
+    self.connection._deliver(loads(bytes_to_str(item)), dest)
+    │    │          │        │     │            │       └ 'celery'
+    │    │          │        │     │            └ b'{"body": "W1sxLCAiRDpcXFZJVEJPVFxcYmFja2VuZFxcYXBwXFxyb3V0ZXJzXFwuLi8uLi91cGxvYWRzL2FkbWluX2RvY3VtZW50c1xcMjAyNTA5MjhfMDIxN...
+    │    │          │        │     └ <function bytes_to_str at 0x000001DB622D5F80>
+    │    │          │        └ <function loads at 0x000001DB623744A0>
+    │    │          └ <function Transport._deliver at 0x000001DB0E66CE00>
+    │    └ <kombu.transport.redis.Transport object at 0x000001DB0E6C2FC0>
+    └ <kombu.transport.redis.Channel object at 0x000001DB0E6C11F0>
+  File "D:\VITBOT\venv\Lib\site-packages\kombu\transport\virtual\base.py", line 1017, in _deliver
+    callback(message)
+    │        └ {'body': 'W1sxLCAiRDpcXFZJVEJPVFxcYmFja2VuZFxcYXBwXFxyb3V0ZXJzXFwuLi8uLi91cGxvYWRzL2FkbWluX2RvY3VtZW50c1xcMjAyNTA5MjhfMDIxNTQ...
+    └ <function Channel.basic_consume.<locals>._callback at 0x000001DB0E6FB9C0>
+  File "D:\VITBOT\venv\Lib\site-packages\kombu\transport\virtual\base.py", line 639, in _callback
+    return callback(message)
+           │        └ <Message object at 0x1db0e6a6180 with details {'state': 'RECEIVED', 'content_type': 'application/json', 'delivery_tag': '4133...
+           └ <bound method Consumer._receive_callback of <Consumer: [<Queue pdf_processing -> <Exchange pdf_processing(direct) bound to ch...
+  File "D:\VITBOT\venv\Lib\site-packages\kombu\messaging.py", line 668, in _receive_callback
+    return on_m(message) if on_m else self.receive(decoded, message)
+           │    │           │         │    │       │        └ <Message object at 0x1db0e6a6180 with details {'state': 'RECEIVED', 'content_type': 'application/json', 'delivery_tag': '4133...
+           │    │           │         │    │       └ None
+           │    │           │         │    └ <function Consumer.receive at 0x000001DB6260C400>
+           │    │           │         └ <Consumer: [<Queue pdf_processing -> <Exchange pdf_processing(direct) bound to chan:1> -> pdf_processing bound to chan:1>, <Q...
+           │    │           └ <function Consumer.create_task_handler.<locals>.on_task_received at 0x000001DB0E6FB7E0>
+           │    └ <Message object at 0x1db0e6a6180 with details {'state': 'RECEIVED', 'content_type': 'application/json', 'delivery_tag': '4133...
+           └ <function Consumer.create_task_handler.<locals>.on_task_received at 0x000001DB0E6FB7E0>
+  File "D:\VITBOT\venv\Lib\site-packages\celery\worker\consumer\consumer.py", line 684, in on_task_received
+    strategy(
+    └ <function default.<locals>.task_message_handler at 0x000001DB0E6F9B20>
+  File "D:\VITBOT\venv\Lib\site-packages\celery\worker\strategy.py", line 207, in task_message_handler
+    handle(req)
+    │      └ <Request: backend.tasks.process_admin_pdf_task[0126fb6c-c01e-4094-aa4e-9e0046af24f2] (1, 'D:\VITBOT\backend\app\routers\../.....
+    └ <bound method WorkController._process_task of <Worker: celery@ARUN (running)>>
+  File "D:\VITBOT\venv\Lib\site-packages\celery\worker\worker.py", line 225, in _process_task
+    req.execute_using_pool(self.pool)
+    │   │                  │    └ <celery.concurrency.solo.TaskPool object at 0x000001DB0E668E00>
+    │   │                  └ <Worker: celery@ARUN (running)>
+    │   └ <function create_request_cls.<locals>.Request.execute_using_pool at 0x000001DB0E6F9BC0>
+    └ <Request: backend.tasks.process_admin_pdf_task[0126fb6c-c01e-4094-aa4e-9e0046af24f2] (1, 'D:\VITBOT\backend\app\routers\../.....
+  File "D:\VITBOT\venv\Lib\site-packages\celery\worker\request.py", line 754, in execute_using_pool
+    result = apply_async(
+             └ <bound method BasePool.apply_async of <celery.concurrency.solo.TaskPool object at 0x000001DB0E668E00>>
+  File "D:\VITBOT\venv\Lib\site-packages\celery\concurrency\base.py", line 153, in apply_async
+    return self.on_apply(target, args, kwargs,
+           │    │        │       │     └ {}
+           │    │        │       └ ('backend.tasks.process_admin_pdf_task', '0126fb6c-c01e-4094-aa4e-9e0046af24f2', {'lang': 'py', 'task': 'backend.tasks.proces...
+           │    │        └ <function fast_trace_task at 0x000001DB634B8C20>
+           │    └ <function apply_target at 0x000001DB634B8F40>
+           └ <celery.concurrency.solo.TaskPool object at 0x000001DB0E668E00>
+  File "D:\VITBOT\venv\Lib\site-packages\celery\concurrency\base.py", line 30, in apply_target
+    ret = target(*args, **kwargs)
+          │       │       └ {}
+          │       └ ('backend.tasks.process_admin_pdf_task', '0126fb6c-c01e-4094-aa4e-9e0046af24f2', {'lang': 'py', 'task': 'backend.tasks.proces...
+          └ <function fast_trace_task at 0x000001DB634B8C20>
+  File "D:\VITBOT\venv\Lib\site-packages\celery\app\trace.py", line 675, in fast_trace_task
+    R, I, T, Rstr = tasks[task].__trace__(
+                    │     └ 'backend.tasks.process_admin_pdf_task'
+                    └ {'celery.group': <@task: celery.group of pdf_processor at 0x1db6201bbf0>, 'celery.map': <@task: celery.map of pdf_processor a...
+  File "D:\VITBOT\venv\Lib\site-packages\celery\app\trace.py", line 477, in trace_task
+    R = retval = fun(*args, **kwargs)
+                 │    │       └ {}
+                 │    └ [1, 'D:\\VITBOT\\backend\\app\\routers\\../../uploads/admin_documents\\20250928_021541_kv_resume_iter_2_(1).pdf', 'kv_resume_...
+                 └ <@task: backend.tasks.process_admin_pdf_task of pdf_processor at 0x1db6201bbf0>
+  File "D:\VITBOT\venv\Lib\site-packages\celery\app\trace.py", line 760, in __protected_call__
+    return self.run(*args, **kwargs)
+           │    │    │       └ {}
+           │    │    └ (1, 'D:\\VITBOT\\backend\\app\\routers\\../../uploads/admin_documents\\20250928_021541_kv_resume_iter_2_(1).pdf', 'kv_resume_...
+           │    └ <function process_admin_pdf_task at 0x000001DB0DE33CE0>
+           └ <@task: backend.tasks.process_admin_pdf_task of pdf_processor at 0x1db6201bbf0>
+
+> File "D:\VITBOT\backend\tasks.py", line 143, in process_admin_pdf_task
+    raise FileNotFoundError(f"PDF file not found: {file_path}")
+                                                   └ 'D:\\VITBOT\\backend\\app\\routers\\../../uploads/admin_documents\\20250928_021541_kv_resume_iter_2_(1).pdf'
+
+FileNotFoundError: PDF file not found: D:\VITBOT\backend\app\routers\../../uploads/admin_documents\20250928_021541_kv_resume_iter_2_(1).pdf
+2025-09-28 02:21:26 | INFO     | CELERY | 🚀 Starting admin PDF processing task for document 2
+2025-09-28 02:21:26 | INFO     | CELERY | 📋 Task ID: ff9a2f33-9c46-47dc-aeef-d9d1de99df58
+2025-09-28 02:21:26 | INFO     | CELERY | 📄 File: research paper - whispering Llama.pdf
+2025-09-28 02:21:26 | INFO     | CELERY | 📂 Path: D:\VITBOT\backend\app\routers\../../uploads/admin_documents\20250928_021541_research_paper_-_whispering_Llama.pdf
+2025-09-28 02:21:26 | ERROR    | CELERY | Error in admin PDF processing task: PDF file not found: D:\VITBOT\backend\app\routers\../../uploads/admin_documents\20250928_021541_research_paper_-_whispering_Llama.pdf
+2025-09-28 02:21:26 | ERROR    | CELERY | Full admin task error traceback:
+Traceback (most recent call last):
+
+  File "D:\VITBOT\start_celery.py", line 42, in <module>
+    celery_app.worker_main([
+    │          └ <function Celery.worker_main at 0x000001DB626F6A20>
+    └ <Celery pdf_processor at 0x1db6201bbf0>
+
+  File "D:\VITBOT\venv\Lib\site-packages\celery\app\base.py", line 388, in worker_main
+    self.start(argv=argv)
+    │    │          └ ['worker', '--loglevel=info', '--pool=solo', '--queues=pdf_processing,celery', '--without-gossip', '--without-mingle', '--wit...
+    │    └ <function Celery.start at 0x000001DB626F6980>
+    └ <Celery pdf_processor at 0x1db6201bbf0>
+  File "D:\VITBOT\venv\Lib\site-packages\celery\app\base.py", line 368, in start
+    celery.main(args=argv, standalone_mode=False)
+    │      │         └ ['worker', '--loglevel=info', '--pool=solo', '--queues=pdf_processing,celery', '--without-gossip', '--without-mingle', '--wit...
+    │      └ <function Command.main at 0x000001DB625E9300>
+    └ <DYMGroup celery>
+  File "D:\VITBOT\venv\Lib\site-packages\click\core.py", line 1383, in main
+    rv = self.invoke(ctx)
+         │    │      └ <click.core.Context object at 0x000001DB601FF1D0>
+         │    └ <function Group.invoke at 0x000001DB625EA200>
+         └ <DYMGroup celery>
+  File "D:\VITBOT\venv\Lib\site-packages\click\core.py", line 1850, in invoke
+    return _process_result(sub_ctx.command.invoke(sub_ctx))
+           │               │       │       │      └ <click.core.Context object at 0x000001DB63562360>
+           │               │       │       └ <function Command.invoke at 0x000001DB625E8FE0>
+           │               │       └ <CeleryDaemonCommand worker>
+           │               └ <click.core.Context object at 0x000001DB63562360>
+           └ <function Group.invoke.<locals>._process_result at 0x000001DB6270FE20>
+  File "D:\VITBOT\venv\Lib\site-packages\click\core.py", line 1246, in invoke
+    return ctx.invoke(self.callback, **ctx.params)
+           │   │      │    │           │   └ {'loglevel': 20, 'pool': <class 'celery.concurrency.solo.TaskPool'>, 'queues': ['pdf_processing', 'celery'], 'without_gossip'...
+           │   │      │    │           └ <click.core.Context object at 0x000001DB63562360>
+           │   │      │    └ <function worker at 0x000001DB63551440>
+           │   │      └ <CeleryDaemonCommand worker>
+           │   └ <function Context.invoke at 0x000001DB625E8220>
+           └ <click.core.Context object at 0x000001DB63562360>
+  File "D:\VITBOT\venv\Lib\site-packages\click\core.py", line 814, in invoke
+    return callback(*args, **kwargs)
+           │         │       └ {'loglevel': 20, 'pool': <class 'celery.concurrency.solo.TaskPool'>, 'queues': ['pdf_processing', 'celery'], 'without_gossip'...
+           │         └ ()
+           └ <function worker at 0x000001DB63551440>
+  File "D:\VITBOT\venv\Lib\site-packages\click\decorators.py", line 34, in new_func
+    return f(get_current_context(), *args, **kwargs)
+           │ │                       │       └ {'loglevel': 20, 'pool': <class 'celery.concurrency.solo.TaskPool'>, 'queues': ['pdf_processing', 'celery'], 'without_gossip'...
+           │ │                       └ ()
+           │ └ <function get_current_context at 0x000001DB625B6840>
+           └ <function worker at 0x000001DB635513A0>
+  File "D:\VITBOT\venv\Lib\site-packages\celery\bin\base.py", line 134, in caller
+    return f(ctx, *args, **kwargs)
+           │ │     │       └ {'loglevel': 20, 'pool': <class 'celery.concurrency.solo.TaskPool'>, 'queues': ['pdf_processing', 'celery'], 'without_gossip'...
+           │ │     └ ()
+           │ └ <click.core.Context object at 0x000001DB63562360>
+           └ <function worker at 0x000001DB63551300>
+  File "D:\VITBOT\venv\Lib\site-packages\celery\bin\worker.py", line 356, in worker
+    worker.start()
+    │      └ <function WorkController.start at 0x000001DB6343E3E0>
+    └ <Worker: celery@ARUN (running)>
+  File "D:\VITBOT\venv\Lib\site-packages\celery\worker\worker.py", line 202, in start
+    self.blueprint.start(self)
+    │    │         │     └ <Worker: celery@ARUN (running)>
+    │    │         └ <function Blueprint.start at 0x000001DB6341A160>
+    │    └ <celery.worker.worker.WorkController.Blueprint object at 0x000001DB0B3B2630>
+    └ <Worker: celery@ARUN (running)>
+  File "D:\VITBOT\venv\Lib\site-packages\celery\bootsteps.py", line 116, in start
+    step.start(parent)
+    │    │     └ <Worker: celery@ARUN (running)>
+    │    └ <function StartStopStep.start at 0x000001DB6341B420>
+    └ <step: Consumer>
+  File "D:\VITBOT\venv\Lib\site-packages\celery\bootsteps.py", line 365, in start
+    return self.obj.start()
+           │    │   └ <function Consumer.start at 0x000001DB0E688D60>
+           │    └ <Consumer: celery@ARUN (running)>
+           └ <step: Consumer>
+  File "D:\VITBOT\venv\Lib\site-packages\celery\worker\consumer\consumer.py", line 340, in start
+    blueprint.start(self)
+    │         │     └ <Consumer: celery@ARUN (running)>
+    │         └ <function Blueprint.start at 0x000001DB6341A160>
+    └ <celery.worker.consumer.consumer.Consumer.Blueprint object at 0x000001DB0E66ABA0>
+  File "D:\VITBOT\venv\Lib\site-packages\celery\bootsteps.py", line 116, in start
+    step.start(parent)
+    │    │     └ <Consumer: celery@ARUN (running)>
+    │    └ <function Evloop.start at 0x000001DB0E68A020>
+    └ <step: event loop>
+  File "D:\VITBOT\venv\Lib\site-packages\celery\worker\consumer\consumer.py", line 742, in start
+    c.loop(*c.loop_args())
+    │ │     │ └ <function Consumer.loop_args at 0x000001DB0E689260>
+    │ │     └ <Consumer: celery@ARUN (running)>
+    │ └ <function synloop at 0x000001DB0E688540>
+    └ <Consumer: celery@ARUN (running)>
+  File "D:\VITBOT\venv\Lib\site-packages\celery\worker\loops.py", line 130, in synloop
+    connection.drain_events(timeout=2.0)
+    │          └ <function Connection.drain_events at 0x000001DB623277E0>
+    └ <Connection: redis://localhost:6379/0 at 0x1db0e6c1520>
+  File "D:\VITBOT\venv\Lib\site-packages\kombu\connection.py", line 341, in drain_events
+    return self.transport.drain_events(self.connection, **kwargs)
+           │    │                      │    │             └ {'timeout': 2.0}
+           │    │                      │    └ <property object at 0x000001DB6233F5B0>
+           │    │                      └ <Connection: redis://localhost:6379/0 at 0x1db0e6c1520>
+           │    └ <property object at 0x000001DB6233FB50>
+           └ <Connection: redis://localhost:6379/0 at 0x1db0e6c1520>
+  File "D:\VITBOT\venv\Lib\site-packages\kombu\transport\virtual\base.py", line 997, in drain_events
+    get(self._deliver, timeout=timeout)
+    │   │    │                 └ 2.0
+    │   │    └ <function Transport._deliver at 0x000001DB0E66CE00>
+    │   └ <kombu.transport.redis.Transport object at 0x000001DB0E6C2FC0>
+    └ <bound method MultiChannelPoller.get of <kombu.transport.redis.MultiChannelPoller object at 0x000001DB0E6C22A0>>
+  File "D:\VITBOT\venv\Lib\site-packages\kombu\transport\redis.py", line 598, in get
+    ret = self.handle_event(fileno, event)
+          │    │            │       └ 1
+          │    │            └ 2068
+          │    └ <function MultiChannelPoller.handle_event at 0x000001DB0E66F2E0>
+          └ <kombu.transport.redis.MultiChannelPoller object at 0x000001DB0E6C22A0>
+  File "D:\VITBOT\venv\Lib\site-packages\kombu\transport\redis.py", line 580, in handle_event
+    return self.on_readable(fileno), self
+           │    │           │        └ <kombu.transport.redis.MultiChannelPoller object at 0x000001DB0E6C22A0>
+           │    │           └ 2068
+           │    └ <function MultiChannelPoller.on_readable at 0x000001DB0E66F240>
+           └ <kombu.transport.redis.MultiChannelPoller object at 0x000001DB0E6C22A0>
+  File "D:\VITBOT\venv\Lib\site-packages\kombu\transport\redis.py", line 576, in on_readable
+    chan.handlers[type]()
+    │    │        └ 'BRPOP'
+    │    └ {'BRPOP': <bound method Channel._brpop_read of <kombu.transport.redis.Channel object at 0x000001DB0E6C11F0>>, 'LISTEN': <boun...
+    └ <kombu.transport.redis.Channel object at 0x000001DB0E6C11F0>
+  File "D:\VITBOT\venv\Lib\site-packages\kombu\transport\redis.py", line 986, in _brpop_read
+    self.connection._deliver(loads(bytes_to_str(item)), dest)
+    │    │          │        │     │            │       └ 'celery'
+    │    │          │        │     │            └ b'{"body": "W1syLCAiRDpcXFZJVEJPVFxcYmFja2VuZFxcYXBwXFxyb3V0ZXJzXFwuLi8uLi91cGxvYWRzL2FkbWluX2RvY3VtZW50c1xcMjAyNTA5MjhfMDIxN...
+    │    │          │        │     └ <function bytes_to_str at 0x000001DB622D5F80>
+    │    │          │        └ <function loads at 0x000001DB623744A0>
+    │    │          └ <function Transport._deliver at 0x000001DB0E66CE00>
+    │    └ <kombu.transport.redis.Transport object at 0x000001DB0E6C2FC0>
+    └ <kombu.transport.redis.Channel object at 0x000001DB0E6C11F0>
+  File "D:\VITBOT\venv\Lib\site-packages\kombu\transport\virtual\base.py", line 1017, in _deliver
+    callback(message)
+    │        └ {'body': 'W1syLCAiRDpcXFZJVEJPVFxcYmFja2VuZFxcYXBwXFxyb3V0ZXJzXFwuLi8uLi91cGxvYWRzL2FkbWluX2RvY3VtZW50c1xcMjAyNTA5MjhfMDIxNTQ...
+    └ <function Channel.basic_consume.<locals>._callback at 0x000001DB0E6FB9C0>
+  File "D:\VITBOT\venv\Lib\site-packages\kombu\transport\virtual\base.py", line 639, in _callback
+    return callback(message)
+           │        └ <Message object at 0x1db0e6a63c0 with details {'state': 'RECEIVED', 'content_type': 'application/json', 'delivery_tag': '2489...
+           └ <bound method Consumer._receive_callback of <Consumer: [<Queue pdf_processing -> <Exchange pdf_processing(direct) bound to ch...
+  File "D:\VITBOT\venv\Lib\site-packages\kombu\messaging.py", line 668, in _receive_callback
+    return on_m(message) if on_m else self.receive(decoded, message)
+           │    │           │         │    │       │        └ <Message object at 0x1db0e6a63c0 with details {'state': 'RECEIVED', 'content_type': 'application/json', 'delivery_tag': '2489...
+           │    │           │         │    │       └ None
+           │    │           │         │    └ <function Consumer.receive at 0x000001DB6260C400>
+           │    │           │         └ <Consumer: [<Queue pdf_processing -> <Exchange pdf_processing(direct) bound to chan:1> -> pdf_processing bound to chan:1>, <Q...
+           │    │           └ <function Consumer.create_task_handler.<locals>.on_task_received at 0x000001DB0E6FB7E0>
+           │    └ <Message object at 0x1db0e6a63c0 with details {'state': 'RECEIVED', 'content_type': 'application/json', 'delivery_tag': '2489...
+           └ <function Consumer.create_task_handler.<locals>.on_task_received at 0x000001DB0E6FB7E0>
+  File "D:\VITBOT\venv\Lib\site-packages\celery\worker\consumer\consumer.py", line 684, in on_task_received
+    strategy(
+    └ <function default.<locals>.task_message_handler at 0x000001DB0E6F9B20>
+  File "D:\VITBOT\venv\Lib\site-packages\celery\worker\strategy.py", line 207, in task_message_handler
+    handle(req)
+    │      └ <Request: backend.tasks.process_admin_pdf_task[ff9a2f33-9c46-47dc-aeef-d9d1de99df58] (2, 'D:\VITBOT\backend\app\routers\../.....
+    └ <bound method WorkController._process_task of <Worker: celery@ARUN (running)>>
+  File "D:\VITBOT\venv\Lib\site-packages\celery\worker\worker.py", line 225, in _process_task
+    req.execute_using_pool(self.pool)
+    │   │                  │    └ <celery.concurrency.solo.TaskPool object at 0x000001DB0E668E00>
+    │   │                  └ <Worker: celery@ARUN (running)>
+    │   └ <function create_request_cls.<locals>.Request.execute_using_pool at 0x000001DB0E6F9BC0>
+    └ <Request: backend.tasks.process_admin_pdf_task[ff9a2f33-9c46-47dc-aeef-d9d1de99df58] (2, 'D:\VITBOT\backend\app\routers\../.....
+  File "D:\VITBOT\venv\Lib\site-packages\celery\worker\request.py", line 754, in execute_using_pool
+    result = apply_async(
+             └ <bound method BasePool.apply_async of <celery.concurrency.solo.TaskPool object at 0x000001DB0E668E00>>
+  File "D:\VITBOT\venv\Lib\site-packages\celery\concurrency\base.py", line 153, in apply_async
+    return self.on_apply(target, args, kwargs,
+           │    │        │       │     └ {}
+           │    │        │       └ ('backend.tasks.process_admin_pdf_task', 'ff9a2f33-9c46-47dc-aeef-d9d1de99df58', {'lang': 'py', 'task': 'backend.tasks.proces...
+           │    │        └ <function fast_trace_task at 0x000001DB634B8C20>
+           │    └ <function apply_target at 0x000001DB634B8F40>
+           └ <celery.concurrency.solo.TaskPool object at 0x000001DB0E668E00>
+  File "D:\VITBOT\venv\Lib\site-packages\celery\concurrency\base.py", line 30, in apply_target
+    ret = target(*args, **kwargs)
+          │       │       └ {}
+          │       └ ('backend.tasks.process_admin_pdf_task', 'ff9a2f33-9c46-47dc-aeef-d9d1de99df58', {'lang': 'py', 'task': 'backend.tasks.proces...
+          └ <function fast_trace_task at 0x000001DB634B8C20>
+  File "D:\VITBOT\venv\Lib\site-packages\celery\app\trace.py", line 675, in fast_trace_task
+    R, I, T, Rstr = tasks[task].__trace__(
+                    │     └ 'backend.tasks.process_admin_pdf_task'
+                    └ {'celery.group': <@task: celery.group of pdf_processor at 0x1db6201bbf0>, 'celery.map': <@task: celery.map of pdf_processor a...
+  File "D:\VITBOT\venv\Lib\site-packages\celery\app\trace.py", line 477, in trace_task
+    R = retval = fun(*args, **kwargs)
+                 │    │       └ {}
+                 │    └ [2, 'D:\\VITBOT\\backend\\app\\routers\\../../uploads/admin_documents\\20250928_021541_research_paper_-_whispering_Llama.pdf'...
+                 └ <@task: backend.tasks.process_admin_pdf_task of pdf_processor at 0x1db6201bbf0>
+  File "D:\VITBOT\venv\Lib\site-packages\celery\app\trace.py", line 760, in __protected_call__
+    return self.run(*args, **kwargs)
+           │    │    │       └ {}
+           │    │    └ (2, 'D:\\VITBOT\\backend\\app\\routers\\../../uploads/admin_documents\\20250928_021541_research_paper_-_whispering_Llama.pdf'...
+           │    └ <function process_admin_pdf_task at 0x000001DB0DE33CE0>
+           └ <@task: backend.tasks.process_admin_pdf_task of pdf_processor at 0x1db6201bbf0>
+
+> File "D:\VITBOT\backend\tasks.py", line 143, in process_admin_pdf_task
+    raise FileNotFoundError(f"PDF file not found: {file_path}")
+                                                   └ 'D:\\VITBOT\\backend\\app\\routers\\../../uploads/admin_documents\\20250928_021541_research_paper_-_whispering_Llama.pdf'
+
+FileNotFoundError: PDF file not found: D:\VITBOT\backend\app\routers\../../uploads/admin_documents\20250928_021541_research_paper_-_whispering_Llama.pdf
+2025-09-28 02:29:44 | INFO     | CELERY | 🚀 Starting admin PDF processing task for document 7
+2025-09-28 02:29:44 | INFO     | CELERY | 📋 Task ID: c1faf205-d365-4a77-8fa9-b625ca73901f
+2025-09-28 02:29:44 | INFO     | CELERY | 📄 File: kv_resume_iter_2 (1).pdf
+2025-09-28 02:29:44 | INFO     | CELERY | 📂 Path: D:\VITBOT\backend\app\routers\../../uploads/admin_documents\20250928_022944_kv_resume_iter_2_(1).pdf
+2025-09-28 02:29:44 | INFO     | CELERY | 🤖 Initializing embeddings model for the first time - this may take a few minutes...
+2025-09-28 02:29:44 | INFO     | CELERY | 📥 Downloading/loading BAAI/bge-small-en-v1.5 model...
+2025-09-28 02:30:02 | SUCCESS  | CELERY | ✅ Embeddings model loaded successfully - subsequent uploads will be faster!
+2025-09-28 02:30:03 | INFO     | CELERY | 🚀 DocumentProcessor initialized with English support
+2025-09-28 02:30:03 | INFO     | CELERY | Loading and extracting text from admin PDF...
+2025-09-28 02:30:03 | INFO     | CELERY | 📝 Detected language: english
+2025-09-28 02:30:03 | INFO     | CELERY | 📊 Text stats: 5087 chars, English: 91.4%
+2025-09-28 02:30:03 | INFO     | CELERY | Admin PDF text extracted - 5087 characters from 1 pages, Language: english
+2025-09-28 02:30:03 | INFO     | CELERY | Splitting english text into chunks...
+2025-09-28 02:30:03 | INFO     | CELERY | Text split into 7 chunks for admin document
+2025-09-28 02:30:03 | INFO     | CELERY | Creating english embeddings for admin document...
+2025-09-28 02:30:11 | INFO     | CELERY | ✅ Created english vector store with 7 vectors and metadata
+2025-09-28 02:30:11 | INFO     | CELERY | Admin vector store created with 7 vectors
+2025-09-28 02:30:11 | INFO     | CELERY | Saving admin vector store...
+2025-09-28 02:30:11 | INFO     | CELERY | Admin vector store saved to: D:\VITBOT\backend\app\services\../../vector_stores\admin_documents\doc_7
+2025-09-28 02:30:11 | INFO     | CELERY | Finalizing admin document processing...
+2025-09-28 02:30:11 | ERROR    | CELERY | Error adding to global vector store: there is no unique or exclusion constraint matching the ON CONFLICT specification
+
+2025-09-28 02:30:11 | INFO     | CELERY | Admin PDF processing completed successfully for document 7
+2025-09-28 02:30:11 | INFO     | CELERY | Final admin stats: 7 vectors, 7 chunks, Language: english
+2025-09-28 02:30:11 | INFO     | CELERY | 🚀 Starting admin PDF processing task for document 8
+2025-09-28 02:30:11 | INFO     | CELERY | 📋 Task ID: 10915ad1-6c71-4f92-8b38-fa8f0041c38a
+2025-09-28 02:30:11 | INFO     | CELERY | 📄 File: research paper - whispering Llama.pdf
+2025-09-28 02:30:11 | INFO     | CELERY | 📂 Path: D:\VITBOT\backend\app\routers\../../uploads/admin_documents\20250928_022944_research_paper_-_whispering_Llama.pdf
+2025-09-28 02:30:11 | INFO     | CELERY | ⚡ Using cached embeddings model - fast loading!
+2025-09-28 02:30:12 | INFO     | CELERY | 🚀 DocumentProcessor initialized with English support
+2025-09-28 02:30:12 | INFO     | CELERY | Loading and extracting text from admin PDF...
+2025-09-28 02:30:12 | INFO     | CELERY | 📝 Detected language: english
+2025-09-28 02:30:12 | INFO     | CELERY | 📊 Text stats: 39919 chars, English: 88.6%
+2025-09-28 02:30:12 | INFO     | CELERY | Admin PDF text extracted - 39910 characters from 10 pages, Language: english
+2025-09-28 02:30:12 | INFO     | CELERY | Splitting english text into chunks...
+2025-09-28 02:30:12 | INFO     | CELERY | Text split into 51 chunks for admin document
+2025-09-28 02:30:12 | INFO     | CELERY | Creating english embeddings for admin document...
+2025-09-28 02:30:17 | INFO     | CELERY | ✅ Created english vector store with 51 vectors and metadata
+2025-09-28 02:30:17 | INFO     | CELERY | Admin vector store created with 51 vectors
+2025-09-28 02:30:17 | INFO     | CELERY | Saving admin vector store...
+2025-09-28 02:30:17 | INFO     | CELERY | Admin vector store saved to: D:\VITBOT\backend\app\services\../../vector_stores\admin_documents\doc_8
+2025-09-28 02:30:17 | INFO     | CELERY | Finalizing admin document processing...
+2025-09-28 02:30:17 | ERROR    | CELERY | Error adding to global vector store: there is no unique or exclusion constraint matching the ON CONFLICT specification
+
+2025-09-28 02:30:17 | INFO     | CELERY | Admin PDF processing completed successfully for document 8
+2025-09-28 02:30:17 | INFO     | CELERY | Final admin stats: 51 vectors, 51 chunks, Language: english
+2025-09-28 02:40:05 | INFO     | CELERY | 🚀 Starting admin PDF processing task for document 11
+2025-09-28 02:40:05 | INFO     | CELERY | 📋 Task ID: 96d01957-eb7a-4af5-95d6-8be9d912dc01
+2025-09-28 02:40:05 | INFO     | CELERY | 📄 File: kv_resume_iter_2 (1).pdf
+2025-09-28 02:40:05 | INFO     | CELERY | 📂 Path: D:\VITBOT\backend\app\routers\../../uploads/admin_documents\20250928_024004_kv_resume_iter_2_(1).pdf
+2025-09-28 02:40:05 | INFO     | CELERY | 🤖 Initializing embeddings model for the first time - this may take a few minutes...
+2025-09-28 02:40:05 | INFO     | CELERY | 📥 Downloading/loading BAAI/bge-small-en-v1.5 model...
+2025-09-28 02:40:19 | SUCCESS  | CELERY | ✅ Embeddings model loaded successfully - subsequent uploads will be faster!
+2025-09-28 02:40:20 | INFO     | CELERY | 🚀 DocumentProcessor initialized with English support
+2025-09-28 02:40:20 | INFO     | CELERY | Loading and extracting text from admin PDF...
+2025-09-28 02:40:20 | INFO     | CELERY | 📝 Detected language: english
+2025-09-28 02:40:20 | INFO     | CELERY | 📊 Text stats: 5087 chars, English: 91.4%
+2025-09-28 02:40:20 | INFO     | CELERY | Admin PDF text extracted - 5087 characters from 1 pages, Language: english
+2025-09-28 02:40:20 | INFO     | CELERY | Splitting english text into chunks...
+2025-09-28 02:40:20 | INFO     | CELERY | Text split into 7 chunks for admin document
+2025-09-28 02:40:20 | INFO     | CELERY | Creating english embeddings for admin document...
+2025-09-28 02:40:27 | INFO     | CELERY | ✅ Created english vector store with 7 vectors and metadata
+2025-09-28 02:40:27 | INFO     | CELERY | Admin vector store created with 7 vectors
+2025-09-28 02:40:27 | INFO     | CELERY | Saving admin vector store...
+2025-09-28 02:40:27 | INFO     | CELERY | Admin vector store saved to: D:\VITBOT\backend\app\services\../../vector_stores\admin_documents\doc_11
+2025-09-28 02:40:27 | INFO     | CELERY | Finalizing admin document processing...
+2025-09-28 02:40:27 | INFO     | CELERY | Admin PDF processing completed successfully for document 11
+2025-09-28 02:40:27 | INFO     | CELERY | Final admin stats: 7 vectors, 7 chunks, Language: english
+2025-09-28 02:40:27 | INFO     | CELERY | 🚀 Starting admin PDF processing task for document 12
+2025-09-28 02:40:27 | INFO     | CELERY | 📋 Task ID: 60e20b62-d26c-4fcd-97c0-c00cff9323ac
+2025-09-28 02:40:27 | INFO     | CELERY | 📄 File: research paper - whispering Llama.pdf
+2025-09-28 02:40:27 | INFO     | CELERY | 📂 Path: D:\VITBOT\backend\app\routers\../../uploads/admin_documents\20250928_024005_research_paper_-_whispering_Llama.pdf
+2025-09-28 02:40:27 | INFO     | CELERY | ⚡ Using cached embeddings model - fast loading!
+2025-09-28 02:40:28 | INFO     | CELERY | 🚀 DocumentProcessor initialized with English support
+2025-09-28 02:40:28 | INFO     | CELERY | Loading and extracting text from admin PDF...
+2025-09-28 02:40:28 | INFO     | CELERY | 📝 Detected language: english
+2025-09-28 02:40:28 | INFO     | CELERY | 📊 Text stats: 39919 chars, English: 88.6%
+2025-09-28 02:40:28 | INFO     | CELERY | Admin PDF text extracted - 39910 characters from 10 pages, Language: english
+2025-09-28 02:40:28 | INFO     | CELERY | Splitting english text into chunks...
+2025-09-28 02:40:28 | INFO     | CELERY | Text split into 51 chunks for admin document
+2025-09-28 02:40:28 | INFO     | CELERY | Creating english embeddings for admin document...
+2025-09-28 02:40:33 | INFO     | CELERY | ✅ Created english vector store with 51 vectors and metadata
+2025-09-28 02:40:33 | INFO     | CELERY | Admin vector store created with 51 vectors
+2025-09-28 02:40:33 | INFO     | CELERY | Saving admin vector store...
+2025-09-28 02:40:33 | INFO     | CELERY | Admin vector store saved to: D:\VITBOT\backend\app\services\../../vector_stores\admin_documents\doc_12
+2025-09-28 02:40:33 | INFO     | CELERY | Finalizing admin document processing...
+2025-09-28 02:40:33 | INFO     | CELERY | Admin PDF processing completed successfully for document 12
+2025-09-28 02:40:33 | INFO     | CELERY | Final admin stats: 51 vectors, 51 chunks, Language: english

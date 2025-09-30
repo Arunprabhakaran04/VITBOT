@@ -31,7 +31,7 @@ if __name__ == "__main__":
     logger.info(f"🔗 Redis URL: {redis_url}")
     logger.info("🔧 Worker Configuration:")
     logger.info("   • Pool: solo (Windows compatible)")
-    logger.info("   • Queue: pdf_processing")
+    logger.info("   • Queues: pdf_processing, celery (for existing tasks)")
     logger.info("   • Gossip: disabled")
     logger.info("   • Mingle: disabled")
     logger.info("   • Heartbeat: disabled")
@@ -43,7 +43,7 @@ if __name__ == "__main__":
             "worker",
             "--loglevel=" + log_level,
             "--pool=solo",  # Use solo pool for Windows
-            "--queues=pdf_processing",
+            "--queues=pdf_processing,celery",  # Listen to both queues to process existing tasks
             "--without-gossip",  # Disable gossip for better Windows compatibility
             "--without-mingle",  # Disable mingle for better Windows compatibility
             "--without-heartbeat"  # Disable heartbeat for better Windows compatibility

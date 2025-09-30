@@ -26,12 +26,23 @@ export const ChatArea = () => {
     pdfs,
     setChats,
     chats,
+    user,
+    adminDocuments
   } = useStore();
   const isMobile = useIsMobile();
   const [isLoading, setIsLoading] = useState(false);
   
-  // Check if user has any PDFs uploaded and they are ready
+  // Check user role
+  const isAdmin = user?.role === 'admin';
+  
+  // Check if user has any PDFs uploaded and they are ready (admin)
   const hasPdf = pdfs.length > 0 && pdfs.some(pdf => pdf.status === 'ready');
+  
+  // Check if there are processed admin documents (for users)
+  const hasAdminDocuments = adminDocuments.some(doc => doc.processing_status === 'completed');
+  
+  // Determine if chat is available based on role
+  const canChat = isAdmin || hasAdminDocuments;
   
   // Check if any PDFs are still processing
   const hasProcessingPdf = pdfs.length > 0 && pdfs.some(pdf => pdf.status === 'processing');
@@ -42,6 +53,11 @@ export const ChatArea = () => {
 
   const handleSendMessage = async () => {
     if (!messageInput.trim() || isLoading) return;
+    
+    // Prevent non-admin users from chatting without admin documents
+    if (!isAdmin && !hasAdminDocuments) {
+      return;
+    }
 
     // Generate a new chat ID if none exists
     let chatId = currentChatId;
@@ -65,10 +81,13 @@ export const ChatArea = () => {
 
     try {
       // Call the real API endpoint
+      // For admins, use their PDFs, for users use admin documents
+      const useRagContext = isAdmin ? hasPdf : hasAdminDocuments;
+      
       const response = await chatAPI.sendMessage(
         userMessage.content, 
         chatId,
-        hasPdf
+        useRagContext
       );
       
       // Add AI response
@@ -135,7 +154,10 @@ export const ChatArea = () => {
                 SAGE
               </h2>
               <p className="text-sm text-muted-foreground">
-                Ask questions about your uploaded documents
+                {isAdmin 
+                  ? "Ask questions about your uploaded documents" 
+                  : "Ask questions about available documents"
+                }
               </p>
             </div>
           </div>
@@ -145,35 +167,56 @@ export const ChatArea = () => {
           </Button>
         </div>
         
-        {/* PDF Status Indicator */}
+        {/* Status Indicator */}
         <div className="mt-2">
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
-                {hasProcessingPdf ? (
-                  <Badge variant="outline" className="bg-amber-50 text-amber-700 border-amber-200">
-                    <AlertCircle className="w-3 h-3 mr-1 animate-pulse" />
-                    PDF Processing...
-                  </Badge>
-                ) : hasPdf ? (
-                  <Badge variant="outline" className="bg-emerald-50 text-emerald-700 border-emerald-200">
-                    <FileText className="w-3 h-3 mr-1" />
-                    PDF Context Active
-                  </Badge>
+                {isAdmin ? (
+                  // Admin status badges
+                  hasProcessingPdf ? (
+                    <Badge variant="outline" className="bg-amber-50 text-amber-700 border-amber-200">
+                      <AlertCircle className="w-3 h-3 mr-1 animate-pulse" />
+                      PDF Processing...
+                    </Badge>
+                  ) : hasPdf ? (
+                    <Badge variant="outline" className="bg-emerald-50 text-emerald-700 border-emerald-200">
+                      <FileText className="w-3 h-3 mr-1" />
+                      PDF Context Active
+                    </Badge>
+                  ) : (
+                    <Badge variant="outline" className="bg-purple-50 text-purple-700 border-purple-200">
+                      <Brain className="w-3 h-3 mr-1" />
+                      General AI Mode
+                    </Badge>
+                  )
                 ) : (
-                  <Badge variant="outline" className="bg-purple-50 text-purple-700 border-purple-200">
-                    <Brain className="w-3 h-3 mr-1" />
-                    General AI Mode
-                  </Badge>
+                  // User status badges
+                  hasAdminDocuments ? (
+                    <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">
+                      <FileText className="w-3 h-3 mr-1" />
+                      Knowledge Base Active
+                    </Badge>
+                  ) : (
+                    <Badge variant="outline" className="bg-gray-50 text-gray-700 border-gray-200">
+                      <AlertCircle className="w-3 h-3 mr-1" />
+                      No Documents Available
+                    </Badge>
+                  )
                 )}
               </TooltipTrigger>
               <TooltipContent>
-                {hasProcessingPdf ? 
-                  "Your PDF is still processing. Responses will use general AI until processing completes." :
-                  hasPdf ? 
-                    "Responses will be based on your uploaded PDF documents" : 
-                    "No PDFs detected. Responses will use general AI knowledge."
-                }
+                {isAdmin ? (
+                  hasProcessingPdf ? 
+                    "Your PDF is still processing. Responses will use general AI until processing completes." :
+                    hasPdf ? 
+                      "Responses will be based on your uploaded PDF documents" : 
+                      "No PDFs detected. Responses will use general AI knowledge."
+                ) : (
+                  hasAdminDocuments ?
+                    "You can ask questions about the available documents in the knowledge base" :
+                    "No documents are available. An administrator needs to upload documents first."
+                )}
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
@@ -193,23 +236,55 @@ export const ChatArea = () => {
               <div className="w-16 h-16 mx-auto mb-4 gradient-primary rounded-2xl flex items-center justify-center">
                 <Send className="w-8 h-8 text-white" />
               </div>
-              <h3 className="text-xl font-semibold text-foreground mb-2">
-                Start a conversation
-              </h3>
-              <p className="text-muted-foreground mb-4">
-                Upload PDFs and ask questions about your documents. I'll provide answers based on the content.
-              </p>
-              <div className="space-y-2 text-sm text-muted-foreground">
-                <p>• Upload research papers, reports, or any PDF documents</p>
-                <p>• Ask specific questions about the content</p>
-                <p>• Get AI-powered answers with source references</p>
-              </div>
               
-              {hasProcessingPdf && (
-                <div className="mt-4 p-3 bg-amber-50 border border-amber-200 rounded-lg text-amber-800 text-sm">
-                  <AlertCircle className="w-4 h-4 inline-block mr-1 animate-pulse" />
-                  Your PDF is still processing. You can start chatting, but responses will use general AI until processing completes.
-                </div>
+              {isAdmin ? (
+                <>
+                  <h3 className="text-xl font-semibold text-foreground mb-2">
+                    Start a conversation
+                  </h3>
+                  <p className="text-muted-foreground mb-4">
+                    Upload PDFs and ask questions about your documents. I'll provide answers based on the content.
+                  </p>
+                  <div className="space-y-2 text-sm text-muted-foreground">
+                    <p>• Upload research papers, reports, or any PDF documents</p>
+                    <p>• Ask specific questions about the content</p>
+                    <p>• Get AI-powered answers with source references</p>
+                  </div>
+                  
+                  {hasProcessingPdf && (
+                    <div className="mt-4 p-3 bg-amber-50 border border-amber-200 rounded-lg text-amber-800 text-sm">
+                      <AlertCircle className="w-4 h-4 inline-block mr-1 animate-pulse" />
+                      Your PDF is still processing. You can start chatting, but responses will use general AI until processing completes.
+                    </div>
+                  )}
+                </>
+              ) : hasAdminDocuments ? (
+                <>
+                  <h3 className="text-xl font-semibold text-foreground mb-2">
+                    Ask about documents
+                  </h3>
+                  <p className="text-muted-foreground mb-4">
+                    Ask questions about the available documents in the knowledge base.
+                  </p>
+                  <div className="space-y-2 text-sm text-muted-foreground">
+                    <p>• Ask specific questions about document content</p>
+                    <p>• Get AI-powered answers with source references</p>
+                    <p>• Explore the available knowledge base</p>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <h3 className="text-xl font-semibold text-foreground mb-2">
+                    No documents available
+                  </h3>
+                  <p className="text-muted-foreground mb-4">
+                    No documents are currently available in the knowledge base.
+                  </p>
+                  <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg text-blue-800 text-sm">
+                    <AlertCircle className="w-4 h-4 inline-block mr-1" />
+                    Please wait for an administrator to upload documents to the knowledge base before you can start chatting.
+                  </div>
+                </>
               )}
             </motion.div>
           </div>
@@ -237,21 +312,27 @@ export const ChatArea = () => {
               value={messageInput}
               onChange={(e) => setMessageInput(e.target.value)}
               onKeyPress={handleKeyPress}
-              placeholder={hasPdf ? "Ask a question about your PDF..." : "Ask a general question..."}
+              placeholder={
+                isAdmin 
+                  ? (hasPdf ? "Ask a question about your PDF..." : "Ask a general question...")
+                  : hasAdminDocuments 
+                    ? "Ask a question about the available documents..."
+                    : "Waiting for documents to be uploaded..."
+              }
               className="min-h-[44px] max-h-32 resize-none bg-surface border-border focus:border-primary focus:ring-primary/20 pr-12"
-              disabled={isLoading}
+              disabled={isLoading || (!isAdmin && !hasAdminDocuments)}
             />
             
             <motion.div
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
+              whileHover={{ scale: canChat ? 1.05 : 1 }}
+              whileTap={{ scale: canChat ? 0.95 : 1 }}
               className="absolute right-2 bottom-2"
             >
               <Button
                 onClick={handleSendMessage}
-                disabled={!messageInput.trim() || isLoading}
+                disabled={!messageInput.trim() || isLoading || !canChat}
                 size="sm"
-                className="gradient-primary text-white hover:shadow-glow transition-all duration-300"
+                className="gradient-primary text-white hover:shadow-glow transition-all duration-300 disabled:opacity-50"
               >
                 <Send className="w-4 h-4" />
               </Button>

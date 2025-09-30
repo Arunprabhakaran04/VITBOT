@@ -8,6 +8,8 @@ class usercreate(BaseModel):
     
 class userout(BaseModel):
     id : int
+    email : EmailStr
+    role : str
     created_at : datetime
     
 class Post(BaseModel):
@@ -22,6 +24,39 @@ class user_message(BaseModel):
 class TokenData(BaseModel):
     id : int
     email : EmailStr
+    role : str = 'user'
+
+class AdminDocument(BaseModel):
+    id: Optional[int] = None
+    filename: str
+    original_filename: str
+    file_path: str
+    file_size: Optional[int] = None
+    document_hash: Optional[str] = None
+    uploaded_by: int
+    processing_status: str = 'pending'
+    vector_store_path: Optional[str] = None
+    language: str = 'english'
+    embedding_model: str = 'BAAI/bge-small-en-v1.5'
+    created_at: Optional[datetime] = None
+    updated_at: Optional[datetime] = None
+    is_active: bool = True
+
+class AdminDocumentResponse(BaseModel):
+    id: int
+    filename: str
+    original_filename: str
+    file_size: Optional[int]
+    processing_status: str
+    language: str
+    created_at: datetime
+    updated_at: datetime
+    is_active: bool
+
+class AdminDocumentsListResponse(BaseModel):
+    documents: List[AdminDocumentResponse]
+    total_count: int
+    active_count: int
 
 class UserTaskStatus(BaseModel):
     task_id: str

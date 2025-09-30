@@ -3,8 +3,11 @@ from .celery_app import celery_app
 from .app.services.rag_service import DocumentProcessor
 from .app.services.dual_embedding_manager import EmbeddingManager
 from .app.services.task_service import TaskService
+from .app.services.admin_document_service import AdminDocumentService, GlobalVectorStoreService
+from .app.services.rag_handler import clear_global_cache
 from .database_connection import get_db_connection
 from .vector_store_db import save_vector_store_path
+from langchain_community.vectorstores import FAISS
 from loguru import logger
 import os
 
@@ -124,4 +127,120 @@ def process_pdf_task(self, user_id: int, file_path: str, filename: str):
         )
         
         # Re-raise the exception with proper Celery format
+        raise Exception(error_msg) 
+
+@celery_app.task(bind=True)
+def process_admin_pdf_task(self, document_id: int, file_path: str, filename: str):
+    """Process PDF for admin global knowledge base using single global vector store"""
+    task_id = self.request.id
+    
+    logger.info(f"🚀 Starting admin PDF processing task for document {document_id}")
+    logger.info(f"📋 Task ID: {task_id}")
+    logger.info(f"📄 File: {filename}")
+    logger.info(f"📂 Path: {file_path}")
+    
+    try:
+        # Validate file exists
+        if not os.path.exists(file_path):
+            raise FileNotFoundError(f"PDF file not found: {file_path}")
+        
+        # Update task and document status
+        self.update_state(state='PROCESSING', meta={'message': 'Starting admin PDF processing...'})
+        TaskService.update_task_status(task_id, 'processing', 'Starting admin PDF processing...')
+        AdminDocumentService.update_document_processing_status(document_id, 'processing')
+        
+        processor = DocumentProcessor()
+        
+        # Extract and process PDF
+        logger.info("Loading and extracting text from admin PDF...")
+        self.update_state(state='PROCESSING', meta={'message': 'Loading and extracting text...'})
+        TaskService.update_task_status(task_id, 'processing', 'Loading and extracting text...')
+        
+        page_texts, language = processor.process_pdf(file_path, filename)
+        total_chars = sum(len(page['text']) for page in page_texts)
+        logger.info(f"Admin PDF text extracted - {total_chars} characters from {len(page_texts)} pages, Language: {language}")
+        
+        # Split text into chunks
+        logger.info(f"Splitting {language} text into chunks...")
+        self.update_state(state='PROCESSING', meta={'message': f'Splitting {language} text into chunks...'})
+        TaskService.update_task_status(task_id, 'processing', f'Splitting {language} text into chunks...')
+        chunks_with_metadata = processor.split_text_with_metadata(page_texts)
+        logger.info(f"Text split into {len(chunks_with_metadata)} chunks for admin document")
+        
+        # Add directly to global vector store using the new manager
+        logger.info("Adding chunks directly to global vector store...")
+        self.update_state(state='PROCESSING', meta={'message': 'Adding to global vector store...'})
+        TaskService.update_task_status(task_id, 'processing', 'Adding to global vector store...')
+        
+        from .app.services.global_vector_store_manager import GlobalVectorStoreManager
+        global_manager = GlobalVectorStoreManager()
+        
+        success = global_manager.add_document_to_global_store(document_id, chunks_with_metadata)
+        
+        if not success:
+            raise Exception("Failed to add document to global vector store")
+        
+        # Get updated stats
+        stats = global_manager.get_global_store_stats()
+        logger.info(f"Global vector store updated - Total vectors: {stats['total_vectors']}, Total documents: {stats['total_documents']}")
+
+        # Update database records
+        logger.info("Finalizing admin document processing...")
+        self.update_state(state='PROCESSING', meta={'message': 'Finalizing admin document...'})
+        TaskService.update_task_status(task_id, 'processing', 'Finalizing admin document...')
+
+        embedding_model = EmbeddingManager.MODEL
+
+        # Update admin document record
+        AdminDocumentService.update_document_processing_status(
+            document_id, 
+            'completed', 
+            stats['store_path'], 
+            language
+        )
+
+        # Clear global cache so users get the new document immediately
+        clear_global_cache()
+        logger.info("Cleared global cache after admin document processing")
+
+        # Mark task as completed
+        TaskService.update_task_status(task_id, 'completed', f'Admin {language.title()} PDF processed successfully')
+
+        logger.info(f"Admin PDF processing completed successfully for document {document_id}")
+        logger.info(f"Final stats - Global vectors: {stats['total_vectors']}, Document chunks: {len(chunks_with_metadata)}, Language: {language}")
+
+        return {
+            'status': 'completed',
+            'message': f'Admin {language.title()} PDF processed successfully',
+            'document_id': document_id,
+            'global_vector_count': stats['total_vectors'],
+            'document_chunks': len(chunks_with_metadata),
+            'language': language,
+            'embedding_model': embedding_model,
+            'total_documents': stats['total_documents']
+        }
+        
+    except Exception as e:
+        error_msg = f"Error in admin PDF processing task: {str(e)}"
+        logger.error(f"{error_msg}")
+        logger.exception("Full admin task error traceback:")
+        
+        # Update task and document status
+        try:
+            TaskService.update_task_status(task_id, 'failed', str(e))
+            AdminDocumentService.update_document_processing_status(document_id, 'failed')
+        except Exception as db_error:
+            logger.error(f"Failed to update admin task status: {db_error}")
+        
+        self.update_state(
+            state='FAILURE',
+            meta={
+                'message': str(e),
+                'error': error_msg,
+                'document_id': document_id,
+                'exc_type': type(e).__name__,
+                'exc_message': str(e)
+            }
+        )
+        
         raise Exception(error_msg) 

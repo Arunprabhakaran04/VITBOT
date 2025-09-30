@@ -16,6 +16,7 @@ import { Button } from '@/components/ui/button';
 import { useStore } from '@/lib/store';
 import { PDFUploadSection } from './PDFUploadSection';
 import { ChatList } from './ChatList';
+import { UserKnowledgeBaseView } from './UserKnowledgeBaseView';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { authAPI } from '@/lib/api';
 import { useToast } from '@/hooks/use-toast';
@@ -26,6 +27,9 @@ export const ChatSidebar = () => {
   const [isLoading, setIsLoading] = useState(false);
   const isMobile = useIsMobile();
   const { toast } = useToast();
+
+  // Check if user is admin
+  const isAdmin = user?.role === 'admin';
 
   const handleNewChat = () => {
     // Generate a new chat ID and clear messages to start a new conversation
@@ -121,7 +125,7 @@ export const ChatSidebar = () => {
             }`}
           >
             <FileText className="w-4 h-4 mr-2" />
-            PDFs
+            {isAdmin ? 'PDFs' : 'Knowledge Base'}
           </button>
         </div>
       </div>
@@ -131,7 +135,7 @@ export const ChatSidebar = () => {
         {activeSection === 'chats' ? (
           <ChatList />
         ) : (
-          <PDFUploadSection />
+          isAdmin ? <PDFUploadSection /> : <UserKnowledgeBaseView />
         )}
       </div>
 
@@ -147,7 +151,7 @@ export const ChatSidebar = () => {
                 {user?.email}
               </p>
               <p className="text-xs text-muted-foreground">
-                Premium Plan
+                {isAdmin ? 'Administrator' : 'User'}
               </p>
             </div>
           </div>

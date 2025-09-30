@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from backend.app.routers import users, chat, pdf_celery as pdf
+from backend.app.routers import users, chat_rbac as chat, pdf_celery as pdf, admin
 from backend.database_connection import get_connection_pool, close_connection_pool
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -26,3 +26,4 @@ async def shutdown_event():
 app.include_router(users.router)
 app.include_router(chat.router)
 app.include_router(pdf.router)
+app.include_router(admin.router)

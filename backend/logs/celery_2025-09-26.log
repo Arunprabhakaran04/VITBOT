@@ -1,0 +1,24 @@
+2025-09-26 01:36:44 | INFO     | CELERY | 🚀 Starting PDF processing task for user 1 in Celery worker
+2025-09-26 01:36:44 | INFO     | CELERY | 📋 Task ID: 3f237499-4fde-44d7-becd-01ea0e38cf0b
+2025-09-26 01:36:44 | INFO     | CELERY | 📄 File: kv_resume_iter_2 (1).pdf
+2025-09-26 01:36:44 | INFO     | CELERY | 📂 Path: D:\VITBOT\backend\app\utils\../../uploads\user_1\20250926013644_kv_resume_iter_2 (1).pdf
+2025-09-26 01:36:44 | INFO     | CELERY | 🔧 Process ID: 10124
+2025-09-26 01:36:44 | INFO     | CELERY | 🤖 Initializing embeddings model for the first time - this may take a few minutes...
+2025-09-26 01:36:44 | INFO     | CELERY | 📥 Downloading/loading BAAI/bge-small-en-v1.5 model...
+2025-09-26 01:36:52 | SUCCESS  | CELERY | ✅ Embeddings model loaded successfully - subsequent uploads will be faster!
+2025-09-26 01:36:53 | INFO     | CELERY | 🚀 DocumentProcessor initialized with English support
+2025-09-26 01:36:53 | INFO     | CELERY | Loading and extracting text from PDF...
+2025-09-26 01:36:53 | INFO     | CELERY | 📝 Detected language: english
+2025-09-26 01:36:53 | INFO     | CELERY | 📊 Text stats: 5087 chars, English: 91.4%
+2025-09-26 01:36:53 | INFO     | CELERY | PDF text extracted successfully - 5087 characters from 1 pages, Language: english
+2025-09-26 01:36:53 | INFO     | CELERY | Splitting english text into chunks...
+2025-09-26 01:36:53 | INFO     | CELERY | Text split into 7 chunks for english processing
+2025-09-26 01:36:53 | INFO     | CELERY | Creating english embeddings...
+2025-09-26 01:37:00 | INFO     | CELERY | ✅ Created english vector store with 7 vectors and metadata
+2025-09-26 01:37:00 | INFO     | CELERY | Vector store created with 7 vectors using english embeddings
+2025-09-26 01:37:00 | INFO     | CELERY | Saving english vector store...
+2025-09-26 01:37:00 | INFO     | CELERY | Vector store saved to: D:\VITBOT\backend\app\services\../../vector_stores\user_1\current_pdf
+2025-09-26 01:37:00 | INFO     | CELERY | Finalizing database update with language information...
+2025-09-26 01:37:00 | INFO     | CELERY | English PDF processing completed successfully for user 1
+2025-09-26 01:37:00 | INFO     | CELERY | Final stats: 7 vectors, 7 chunks, Language: english
+2025-09-26 01:37:00 | INFO     | CELERY | Embedding model used: BAAI/bge-small-en-v1.5

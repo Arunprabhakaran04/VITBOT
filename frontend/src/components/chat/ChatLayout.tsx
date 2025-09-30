@@ -4,9 +4,16 @@ import { useStore } from '@/lib/store';
 import { ChatSidebar } from './ChatSidebar';
 import { ChatArea } from './ChatArea';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { enhancedChatAPI } from '@/lib/api';
 
 export const ChatLayout = () => {
-  const { sidebarOpen, setSidebarOpen } = useStore();
+  const { 
+    sidebarOpen, 
+    setSidebarOpen, 
+    user, 
+    setAdminDocuments,
+    setKnowledgeBaseStatus 
+  } = useStore();
   const isMobile = useIsMobile();
 
   // Close sidebar on mobile by default
@@ -15,6 +22,39 @@ export const ChatLayout = () => {
       setSidebarOpen(false);
     }
   }, [isMobile, setSidebarOpen]);
+
+  // Load knowledge base documents for all users
+  useEffect(() => {
+    const loadKnowledgeBase = async () => {
+      try {
+        // Load documents available to users
+        const documentsResponse = await enhancedChatAPI.getKnowledgeBaseDocuments();
+        setAdminDocuments(documentsResponse.documents || []);
+        
+        // Load knowledge base status
+        const statusResponse = await enhancedChatAPI.getKnowledgeBaseStatus();
+        setKnowledgeBaseStatus(statusResponse);
+        
+        console.log(`Loaded ${documentsResponse.documents?.length || 0} documents for user`);
+      } catch (error) {
+        console.error('Error loading knowledge base:', error);
+        // Set empty state if loading fails
+        setAdminDocuments([]);
+        setKnowledgeBaseStatus({
+          available_documents: 0,
+          total_chunks: 0,
+          languages: 0,
+          status: 'empty',
+          can_upload: user?.role === 'admin',
+          can_query: false
+        });
+      }
+    };
+
+    if (user) {
+      loadKnowledgeBase();
+    }
+  }, [user, setAdminDocuments, setKnowledgeBaseStatus]);
 
   return (
     <div className="flex h-screen bg-background">

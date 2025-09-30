@@ -7,7 +7,7 @@ from contextlib import contextmanager
 
 load_dotenv()
 
-database = os.getenv("database", "fastapi")
+database = os.getenv("database", "VITBOT")
 user = os.getenv("user")
 password = os.getenv("password_db")
 

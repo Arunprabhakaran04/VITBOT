@@ -105,3 +105,68 @@ export const pdfAPI = {
 };
 
 export default api;
+
+// Admin API
+export const adminAPI = {
+  // Document Management
+  getDocuments: async () => {
+    const response = await api.get('/admin/documents');
+    return response.data;
+  },
+  
+  uploadDocument: async (file: File) => {
+    const formData = new FormData();
+    formData.append('file', file);
+    
+    const response = await api.post('/admin/documents/upload', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+    return response.data;
+  },
+  
+  getDocument: async (documentId: number) => {
+    const response = await api.get(`/admin/documents/${documentId}`);
+    return response.data;
+  },
+  
+  deleteDocument: async (documentId: number) => {
+    const response = await api.delete(`/admin/documents/${documentId}`);
+    return response.data;
+  },
+  
+  getDocumentsByStatus: async (status: string) => {
+    const response = await api.get(`/admin/documents/status/${status}`);
+    return response.data;
+  },
+  
+  // Knowledge Base Management
+  getKnowledgeBaseStats: async () => {
+    const response = await api.get('/admin/knowledge-base/stats');
+    return response.data;
+  },
+  
+  getVectorStores: async () => {
+    const response = await api.get('/admin/vector-stores');
+    return response.data;
+  },
+  
+  rebuildKnowledgeBase: async () => {
+    const response = await api.post('/admin/rebuild-knowledge-base');
+    return response.data;
+  },
+};
+
+// Enhanced Chat API with role awareness
+export const enhancedChatAPI = {
+  getKnowledgeBaseStatus: async () => {
+    const response = await api.get('/knowledge_base_status');
+    return response.data;
+  },
+  
+  getKnowledgeBaseDocuments: async () => {
+    const response = await api.get('/knowledge_base_documents');
+    return response.data;
+  },
+};

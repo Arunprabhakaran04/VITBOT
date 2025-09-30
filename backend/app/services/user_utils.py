@@ -50,7 +50,7 @@ class UserUtils:
             with get_db_connection() as conn:
                 cursor = conn.cursor()
                 cursor.execute("""
-                    SELECT id, email, password, created_at
+                    SELECT id, email, password, role, created_at
                     FROM users 
                     WHERE email = %s
                 """, (email,))
@@ -69,7 +69,7 @@ class UserUtils:
             with get_db_connection() as conn:
                 cursor = conn.cursor()
                 cursor.execute("""
-                    SELECT id, email, created_at
+                    SELECT id, email, role, created_at
                     FROM users 
                     WHERE id = %s
                 """, (user_id,))

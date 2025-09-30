@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -7,6 +8,7 @@ import { Mail, Lock, LogIn } from 'lucide-react';
 import { useStore } from '@/lib/store';
 import { useToast } from '@/hooks/use-toast';
 import { authAPI } from '@/lib/api';
+import { QuickLogin } from './QuickLogin';
 
 export const LoginForm = () => {
   const [email, setEmail] = useState('');
@@ -15,6 +17,7 @@ export const LoginForm = () => {
   
   const { setUser } = useStore();
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -26,6 +29,7 @@ export const LoginForm = () => {
       
       setUser({
         email,
+        role: response.role || 'user', // Include role from response
         token: response.access_token
       });
 
@@ -33,6 +37,14 @@ export const LoginForm = () => {
         title: "Welcome back!",
         description: "You've been successfully signed in.",
       });
+
+      // Navigate based on role
+      if (response.role === 'admin') {
+        navigate('/admin');
+      } else {
+        // Stay on main page for regular users
+        navigate('/');
+      }
     } catch (error) {
       console.error('Login error:', error);
       toast({
@@ -116,6 +128,14 @@ export const LoginForm = () => {
           Forgot your password?
         </button>
       </div>
+
+      {/* Quick Login for Development */}
+      <QuickLogin 
+        onFillCredentials={(email, password) => {
+          setEmail(email);
+          setPassword(password);
+        }}
+      />
     </form>
   );
 };
