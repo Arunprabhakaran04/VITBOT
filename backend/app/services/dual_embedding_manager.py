@@ -19,30 +19,30 @@ class EmbeddingManager:
         logger.info("Initialized Embedding Manager")
     
     @classmethod
-    def _check_redis_cache(cls) -> bool:
-        """Check if model exists in Redis cache"""
+    def _check_memory_cache(cls) -> bool:
+        """Check if model exists in memory cache"""
         try:
-            from ...redis_cache import cache
+            from ...memory_cache import cache
             key = f"embedding_model_loaded:english"
             cached = cache.get(key)
             if cached:
-                logger.info(f"🔄 English model was previously loaded in another process")
+                logger.info(f"English model was previously loaded in another process")
                 return True
             return False
         except Exception as e:
-            logger.debug(f"Redis cache check failed: {e}")
+            logger.debug(f"Memory cache check failed: {e}")
             return False
     
     @classmethod
-    def _mark_redis_cache(cls):
-        """Mark model as loaded in Redis cache"""
+    def _mark_memory_cache(cls):
+        """Mark model as loaded in memory cache"""
         try:
-            from ...redis_cache import cache
+            from ...memory_cache import cache
             key = f"embedding_model_loaded:english"
             cache.set(key, True, expire=3600 * 24)  # 24 hours
-            logger.info(f"✅ Marked English model as loaded in Redis")
+            logger.info(f"Marked English model as loaded in memory cache")
         except Exception as e:
-            logger.debug(f"Redis cache marking failed: {e}")
+            logger.debug(f"Memory cache marking failed: {e}")
 
     @classmethod
     def get_embeddings_static(cls) -> HuggingFaceEmbeddings:
@@ -54,15 +54,15 @@ class EmbeddingManager:
         
         # Return cached model if available (GLOBAL CACHE)
         if 'english' in _GLOBAL_EMBEDDING_CACHE:
-            logger.info(f"⚡ Using globally cached English embedding model")
+            logger.info(f"Using globally cached English embedding model")
             return _GLOBAL_EMBEDDING_CACHE['english']
         
-        # Check if model was loaded in another process (REDIS AWARENESS)
+        # Check if model was loaded in another process (MEMORY CACHE AWARENESS)
         model_name = cls.MODEL
-        if cls._check_redis_cache():
-            logger.info(f"🔄 English model exists in another process, loading to this process...")
+        if cls._check_memory_cache():
+            logger.info(f"English model exists in another process, loading to this process...")
         else:
-            logger.info(f"🤖 Loading English embedding model: {model_name} (first time across all processes)")
+            logger.info(f"Loading English embedding model: {model_name} (first time across all processes)")
         
         try:
             embedding_model = HuggingFaceEmbeddings(
@@ -74,16 +74,16 @@ class EmbeddingManager:
             # Cache the model GLOBALLY
             _GLOBAL_EMBEDDING_CACHE['english'] = embedding_model
             
-            # Mark as loaded in Redis for other processes
-            cls._mark_redis_cache()
+            # Mark as loaded in memory cache for other processes
+            cls._mark_memory_cache()
             
-            logger.info(f"✅ English embedding model loaded and cached globally")
-            logger.info(f"📊 Global cache now contains: {list(_GLOBAL_EMBEDDING_CACHE.keys())}")
+            logger.info(f"English embedding model loaded and cached globally")
+            logger.info(f"Global cache now contains: {list(_GLOBAL_EMBEDDING_CACHE.keys())}")
             
             return embedding_model
             
         except Exception as e:
-            logger.error(f"❌ Failed to load English embedding model {model_name}: {e}")
+            logger.error(f"Failed to load English embedding model {model_name}: {e}")
             raise e
     
     def get_embeddings(self) -> HuggingFaceEmbeddings:

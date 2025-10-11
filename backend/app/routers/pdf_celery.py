@@ -2,7 +2,8 @@ from fastapi import APIRouter, Depends, File, UploadFile, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from ...oauth2 import get_current_user
 from ..utils.file_utils import save_pdf_file
-from ...tasks import process_pdf_task
+from ..services.pdf_processing_service import pdf_processing_service
+from ..services.background_task_service import background_service
 from ..services.task_service import TaskService
 from ...schemas import UserTasksResponse
 from ..services.rag_handler import clear_user_cache
@@ -22,20 +23,32 @@ async def upload_pdf(file: UploadFile = File(...), token: str = Depends(oauth2_s
         raise HTTPException(status_code=400, detail="Only PDF files are allowed.")
 
     try:
+        from ..config.settings import settings
+        
+        # Validate file size
+        content = await file.read()
+        file_size = len(content)
+        
+        if file_size > settings.get_max_file_size_bytes():
+            raise HTTPException(
+                status_code=413, 
+                detail=f"File size exceeds {settings.MAX_FILE_SIZE_MB}MB limit"
+            )
+        
+        # Reset file position for save_pdf_file
+        await file.seek(0)
+        
         cleanup_existing_vectorstore(user_id)
         
         file_path = save_pdf_file(file, user_id)
         logger.info(f"PDF saved to: {file_path}")
 
-        # Queue the task with Celery
-        task = process_pdf_task.delay(user_id, file_path, file.filename)
-        
-        # Store task in database for tracking
-        TaskService.store_user_task(user_id, task.id, "pdf_processing", file.filename)
+        # Queue the task with background service
+        task_id = pdf_processing_service.queue_pdf_processing(user_id, file_path, file.filename)
         
         return {
             "message": "PDF uploaded successfully and queued for processing",
-            "task_id": task.id,
+            "task_id": task_id,
             "status": "queued"
         }
 
@@ -48,7 +61,11 @@ async def get_task_status(task_id: str, token: str = Depends(oauth2_scheme)):
     """Get the status of a specific task"""
     user_data = get_current_user(token)
     
-    task_info = TaskService.get_task_with_celery_status(task_id)
+    # Get task info from background service
+    background_task = background_service.get_task_status(task_id)
+    
+    # Get database task info for validation
+    task_info = TaskService.get_task_info(task_id)
     
     if not task_info:
         raise HTTPException(status_code=404, detail="Task not found")
@@ -57,7 +74,8 @@ async def get_task_status(task_id: str, token: str = Depends(oauth2_scheme)):
     if task_info['user_id'] != user_data.id:
         raise HTTPException(status_code=403, detail="Access denied")
     
-    return {
+    # Combine background task status with database info
+    status_info = {
         'task_id': task_info['task_id'],
         'task_type': task_info['task_type'],
         'status': task_info['status'],
@@ -66,6 +84,16 @@ async def get_task_status(task_id: str, token: str = Depends(oauth2_scheme)):
         'created_at': task_info['created_at'],
         'updated_at': task_info['updated_at']
     }
+    
+    # Add real-time info if available
+    if background_task:
+        status_info.update({
+            'progress': background_task.progress,
+            'real_time_status': background_task.status.value,
+            'real_time_message': background_task.message
+        })
+    
+    return status_info
 
 @router.get("/processing_status", response_model=UserTasksResponse)
 async def get_user_processing_status(token: str = Depends(oauth2_scheme)):
@@ -94,11 +122,9 @@ def cleanup_existing_vectorstore(user_id: int):
         user_vector_dir = os.path.join(processor.vector_store_dir, f"user_{user_id}")
         if os.path.exists(user_vector_dir):
             shutil.rmtree(user_vector_dir)
-            logger.info(f"🗑️ Cleaned up existing vector store for user {user_id}")
+            logger.info(f"Cleaned up existing vector store for user {user_id}")
     except Exception as e:
-        logger.warning(f"⚠️ Could not clean up existing vector store: {e}")
-    
-    # Clear the in-memory cache for this user
+        logger.warning(f"Could not clean up existing vector store: {e}")    # Clear the in-memory cache for this user
     clear_user_cache(user_id)
 
 @router.post("/cleanup_old_tasks")
@@ -124,21 +150,17 @@ def cleanup_user_data(user_id: int):
         user_vector_dir = os.path.join(processor.vector_store_dir, f"user_{user_id}")
         if os.path.exists(user_vector_dir):
             shutil.rmtree(user_vector_dir)
-            logger.info(f"🗑️ Cleaned up vector store for user {user_id}")
+            logger.info(f"Cleaned up vector store for user {user_id}")
     except Exception as e:
-        logger.warning(f"⚠️ Could not clean up vector store: {e}")
-
-    # Clean up uploads
+        logger.warning(f"Could not clean up vector store: {e}")    # Clean up uploads
     try:
         from ..utils.file_utils import get_user_upload_dir
         user_upload_dir = get_user_upload_dir(user_id)
         if os.path.exists(user_upload_dir):
             shutil.rmtree(user_upload_dir)
-            logger.info(f"🗑️ Cleaned up uploads for user {user_id}")
+            logger.info(f"Cleaned up uploads for user {user_id}")
     except Exception as e:
-        logger.warning(f"⚠️ Could not clean up uploads: {e}")
-    
-    # Clear the in-memory cache for this user
+        logger.warning(f"Could not clean up uploads: {e}")    # Clear the in-memory cache for this user
     clear_user_cache(user_id)
 
 @router.post("/logout")

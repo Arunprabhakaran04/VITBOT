@@ -76,43 +76,43 @@ def setup_startup_logging():
 
 # Log levels configuration
 LOG_LEVELS = {
-    "DEBUG": "🐛",
-    "INFO": "ℹ️",
-    "SUCCESS": "✅",
-    "WARNING": "⚠️",
-    "ERROR": "❌",
-    "CRITICAL": "🚨"
+    "DEBUG": "DEBUG",
+    "INFO": "INFO",
+    "SUCCESS": "SUCCESS",
+    "WARNING": "WARNING",
+    "ERROR": "ERROR",
+    "CRITICAL": "CRITICAL"
 }
 
-# Custom log messages with emojis
+# Custom log messages (clean, professional)
 def log_startup(message: str):
-    """Log startup messages with rocket emoji"""
-    logger.info(f"🚀 {message}")
+    """Log startup messages"""
+    logger.info(f"STARTUP: {message}")
 
 def log_pdf_processing(message: str):
     """Log PDF processing messages"""
-    logger.info(f"📄 {message}")
+    logger.info(f"PDF: {message}")
 
 def log_cache_operation(message: str):
     """Log cache operations"""
-    logger.info(f"🗂️ {message}")
+    logger.info(f"CACHE: {message}")
 
 def log_database_operation(message: str):
     """Log database operations"""
-    logger.info(f"🗃️ {message}")
+    logger.info(f"DATABASE: {message}")
 
 def log_user_action(message: str):
     """Log user actions"""
-    logger.info(f"👤 {message}")
+    logger.info(f"USER: {message}")
 
 def log_error(message: str):
-    """Log errors with error emoji"""
-    logger.error(f"❌ {message}")
+    """Log errors"""
+    logger.error(f"ERROR: {message}")
 
 def log_success(message: str):
     """Log success messages"""
-    logger.success(f"✅ {message}")
+    logger.success(f"SUCCESS: {message}")
 
 def log_warning(message: str):
     """Log warnings"""
-    logger.warning(f"⚠️ {message}") 
+    logger.warning(f"WARNING: {message}") 

@@ -14,7 +14,8 @@ from ..services.admin_document_service import AdminDocumentService, GlobalVector
 from ..utils.file_utils import get_user_upload_dir
 from ..services.task_service import TaskService
 from ..services.rag_handler import clear_global_cache
-from ...tasks import process_admin_pdf_task
+from ..services.pdf_processing_service import pdf_processing_service
+from ..services.background_task_service import background_service
 
 router = APIRouter(prefix="/admin", tags=["admin"])
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
@@ -46,6 +47,22 @@ async def upload_admin_document(
         raise HTTPException(status_code=400, detail="Only PDF files are allowed.")
 
     try:
+        from ..config.settings import settings
+        
+        # Validate file size
+        file_size = 0
+        content = await file.read()
+        file_size = len(content)
+        
+        if file_size > settings.get_max_file_size_bytes():
+            raise HTTPException(
+                status_code=413, 
+                detail=f"File size exceeds {settings.MAX_FILE_SIZE_MB}MB limit"
+            )
+        
+        # Reset file position
+        await file.seek(0)
+        
         # Create admin upload directory
         admin_upload_dir = os.path.join(
             os.path.dirname(__file__), 
@@ -61,9 +78,7 @@ async def upload_admin_document(
         
         # Save file
         with open(file_path, "wb") as buffer:
-            shutil.copyfileobj(file.file, buffer)
-        
-        file_size = os.path.getsize(file_path)
+            buffer.write(content)
         
         # Create database record
         document_record = AdminDocumentService.create_admin_document(
@@ -75,16 +90,19 @@ async def upload_admin_document(
         )
         
         # Queue processing task
-        task = process_admin_pdf_task.delay(
+        task_id = pdf_processing_service.queue_admin_pdf_processing(
             document_record['id'], 
             file_path, 
             file.filename
         )
         
+        # Update document with task_id
+        AdminDocumentService.update_document_task_id(document_record['id'], task_id)
+        
         # Track task
         TaskService.store_user_task(
             current_admin.id, 
-            task.id, 
+            task_id, 
             "admin_pdf_processing", 
             file.filename
         )
@@ -94,7 +112,7 @@ async def upload_admin_document(
         return {
             "message": "Document uploaded successfully and queued for processing",
             "document_id": document_record['id'],
-            "task_id": task.id,
+            "task_id": task_id,
             "status": "queued"
         }
 
@@ -130,23 +148,15 @@ async def delete_admin_document(
         if not document:
             raise HTTPException(status_code=404, detail="Document not found")
         
-        # Remove from global vector store using the new manager
-        from ..services.global_vector_store_manager import GlobalVectorStoreManager
-        global_manager = GlobalVectorStoreManager()
-        
-        # Remove from global vector store
-        removal_success = global_manager.remove_document_from_global_store(document_id)
-        
-        if not removal_success:
-            logger.warning(f"Failed to remove document {document_id} from global vector store")
-        
-        # Soft delete the document record
+        # Delete the document (this now handles vector store removal automatically)
         success = AdminDocumentService.delete_document(document_id, soft_delete=True)
         
         if not success:
             raise HTTPException(status_code=404, detail="Document not found or already deleted")
         
         # Get updated stats
+        from ..services.global_vector_store_manager import GlobalVectorStoreManager
+        global_manager = GlobalVectorStoreManager()
         stats = global_manager.get_global_store_stats()
         
         # Clear global cache since admin documents changed
@@ -181,11 +191,6 @@ async def force_delete_admin_document(
         if not document:
             raise HTTPException(status_code=404, detail="Document not found")
         
-        # Remove from global vector store
-        from ..services.global_vector_store_manager import GlobalVectorStoreManager
-        global_manager = GlobalVectorStoreManager()
-        removal_success = global_manager.remove_document_from_global_store(document_id)
-        
         # Delete physical file
         file_deleted = False
         if document.get('file_path') and os.path.exists(document['file_path']):
@@ -196,13 +201,15 @@ async def force_delete_admin_document(
             except Exception as e:
                 logger.warning(f"Failed to delete physical file: {e}")
         
-        # Hard delete the document record
+        # Hard delete the document record (this now handles vector store removal automatically)
         success = AdminDocumentService.delete_document(document_id, soft_delete=False)
         
         if not success:
             raise HTTPException(status_code=404, detail="Document not found")
         
         # Get updated stats
+        from ..services.global_vector_store_manager import GlobalVectorStoreManager
+        global_manager = GlobalVectorStoreManager()
         stats = global_manager.get_global_store_stats()
         
         # Clear global cache
@@ -215,7 +222,7 @@ async def force_delete_admin_document(
             "document_id": document_id,
             "filename": document['original_filename'],
             "file_deleted": file_deleted,
-            "vector_store_updated": removal_success,
+            "vector_store_updated": success,  # Use the delete success status
             "global_stats": {
                 "total_vectors": stats['total_vectors'],
                 "total_documents": stats['total_documents']
@@ -333,8 +340,34 @@ async def clear_global_document_cache(current_admin: TokenData = Depends(get_cur
     except Exception as e:
         logger.error(f"Error clearing global cache: {str(e)}")
         raise HTTPException(status_code=500, detail="Error clearing cache")
-        logger.info(f"Global cache cleared manually by admin {current_admin.id}")
-        return {"message": "Global cache cleared successfully"}
-    except Exception as e:
-        logger.error(f"Error clearing global cache: {str(e)}")
-        raise HTTPException(status_code=500, detail="Error clearing cache")
+
+@router.get("/system/queue-status")
+async def get_queue_status(current_admin: TokenData = Depends(get_current_admin_user)):
+    """Get current background processing queue status"""
+    
+    active_tasks = background_service.get_active_tasks()
+    pending_tasks = sum(1 for task in active_tasks.values() if task["status"] == "pending")
+    processing_tasks = sum(1 for task in active_tasks.values() if task["status"] == "processing")
+    
+    return {
+        "queue_size": background_service.get_queue_size(),
+        "pending_tasks": pending_tasks,
+        "processing_tasks": processing_tasks,
+        "max_workers": background_service.max_workers,
+        "workers_running": background_service.running,
+        "active_tasks": active_tasks
+    }
+
+@router.get("/system/health")
+async def get_system_health(current_admin: TokenData = Depends(get_current_admin_user)):
+    """Health check for background processing system"""
+    
+    return {
+        "status": "healthy" if background_service.running else "unhealthy",
+        "background_workers": {
+            "running": background_service.running,
+            "worker_count": background_service.max_workers,
+            "queue_size": background_service.get_queue_size()
+        },
+        "message": "Background processing system is operational" if background_service.running else "Background processing system is not running"
+    }

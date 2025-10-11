@@ -8,3 +8,6 @@ debug_database.py
 test_connection_pool.py
 chatbot-fronted/node_modules/
 node_modules/
+vitbot_detailed.log
+vitbot.log
+VITBOT_ADMIN_SYSTEM_SETUP.sql

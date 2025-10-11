@@ -332,16 +332,18 @@ async def clear_pdf(current_user: TokenData = Depends(get_current_user)):
 @router.get("/user_cache_data")
 async def get_user_cache_data(current_user: TokenData = Depends(get_current_user)):
     """Get cache information for current user"""
-    from ...redis_cache import cache
+    from ...memory_cache import cache
     
     try:
-        user_keys = cache.get_user_keys(current_user.id)
+        # Use cache info instead of listing individual keys (privacy)
+        cache_info = cache.get_cache_info()
         
         return {
             "user_id": current_user.id,
             "user_role": current_user.role,
-            "total_keys": len(user_keys),
-            "key_samples": user_keys[:10] if len(user_keys) > 10 else user_keys
+            "total_cache_keys": cache_info.get('active_keys', 0),
+            "cache_type": "memory",
+            "message": "Individual user keys not listed for privacy"
         }
     except Exception as e:
         logger.error(f"Error getting cache data: {str(e)}")

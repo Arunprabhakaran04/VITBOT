@@ -1,0 +1,56 @@
+2025-10-11 05:50:18 | INFO     | CELERY | 🚀 Starting admin PDF processing task for document 3
+2025-10-11 05:50:18 | INFO     | CELERY | 📋 Task ID: e25d84aa-da93-48e3-abed-a3d3f355fac7
+2025-10-11 05:50:18 | INFO     | CELERY | 📄 File: Cloud Technology Development Programme.pdf
+2025-10-11 05:50:18 | INFO     | CELERY | 📂 Path: D:\VITBOT\backend\app\routers\../../uploads/admin_documents\20251011_055018_Cloud_Technology_Development_Programme.pdf
+2025-10-11 05:50:19 | INFO     | CELERY | 🤖 Initializing embeddings model for the first time - this may take a few minutes...
+2025-10-11 05:50:19 | INFO     | CELERY | 📥 Downloading/loading BAAI/bge-small-en-v1.5 model...
+2025-10-11 05:50:59 | SUCCESS  | CELERY | ✅ Embeddings model loaded successfully - subsequent uploads will be faster!
+2025-10-11 05:51:00 | INFO     | CELERY | 🚀 DocumentProcessor initialized with English support
+2025-10-11 05:51:00 | INFO     | CELERY | Loading and extracting text from admin PDF...
+2025-10-11 05:51:00 | INFO     | CELERY | 📝 Detected language: english
+2025-10-11 05:51:00 | INFO     | CELERY | 📊 Text stats: 4479 chars, English: 94.8%
+2025-10-11 05:51:00 | INFO     | CELERY | Admin PDF text extracted - 4477 characters from 3 pages, Language: english
+2025-10-11 05:51:00 | INFO     | CELERY | Splitting english text into chunks...
+2025-10-11 05:51:00 | INFO     | CELERY | Text split into 6 chunks for admin document
+2025-10-11 05:51:00 | INFO     | CELERY | Adding chunks directly to global vector store...
+2025-10-11 05:51:00 | INFO     | CELERY | admin_documents table exists: True
+2025-10-11 05:51:00 | INFO     | CELERY | Document chunks and global vector store tables created successfully
+2025-10-11 05:51:05 | INFO     | CELERY | Loaded existing global vector store with 67 vectors
+2025-10-11 05:51:08 | INFO     | CELERY | Added 6 chunks from document 3 to global store
+2025-10-11 05:51:08 | INFO     | CELERY | Global store now has 73 total vectors
+2025-10-11 05:51:08 | INFO     | CELERY | Added 6 chunks for document 3
+2025-10-11 05:51:08 | INFO     | CELERY | Loaded existing global vector store with 73 vectors
+2025-10-11 05:51:08 | INFO     | CELERY | Global vector store updated - Total vectors: 73, Total documents: 3
+2025-10-11 05:51:08 | INFO     | CELERY | Finalizing admin document processing...
+2025-10-11 05:51:08 | INFO     | CELERY | Cleared global vector store cache
+2025-10-11 05:51:08 | INFO     | CELERY | Cleared 0 combined user caches due to global cache update
+2025-10-11 05:51:08 | INFO     | CELERY | Cleared global cache after admin document processing
+2025-10-11 05:51:08 | INFO     | CELERY | Admin PDF processing completed successfully for document 3
+2025-10-11 05:51:08 | INFO     | CELERY | Final stats - Global vectors: 73, Document chunks: 6, Language: english
+2025-10-11 05:57:46 | INFO     | CELERY | 🚀 Starting admin PDF processing task for document 3
+2025-10-11 05:57:46 | INFO     | CELERY | 📋 Task ID: bc476922-09fc-4742-b02f-8ce5ffcbb56f
+2025-10-11 05:57:46 | INFO     | CELERY | 📄 File: Cloud Technology Development Programme.pdf
+2025-10-11 05:57:46 | INFO     | CELERY | 📂 Path: D:\VITBOT\backend\app\routers\../../uploads/admin_documents\20251011_055713_Cloud_Technology_Development_Programme.pdf
+2025-10-11 05:57:46 | INFO     | CELERY | ⚡ Using cached embeddings model - fast loading!
+2025-10-11 05:57:49 | INFO     | CELERY | 🚀 DocumentProcessor initialized with English support
+2025-10-11 05:57:49 | INFO     | CELERY | Loading and extracting text from admin PDF...
+2025-10-11 05:57:49 | INFO     | CELERY | 📝 Detected language: english
+2025-10-11 05:57:49 | INFO     | CELERY | 📊 Text stats: 4479 chars, English: 94.8%
+2025-10-11 05:57:49 | INFO     | CELERY | Admin PDF text extracted - 4477 characters from 3 pages, Language: english
+2025-10-11 05:57:49 | INFO     | CELERY | Splitting english text into chunks...
+2025-10-11 05:57:49 | INFO     | CELERY | Text split into 6 chunks for admin document
+2025-10-11 05:57:49 | INFO     | CELERY | Adding chunks directly to global vector store...
+2025-10-11 05:57:49 | INFO     | CELERY | admin_documents table exists: True
+2025-10-11 05:57:49 | INFO     | CELERY | Document chunks and global vector store tables created successfully
+2025-10-11 05:57:49 | INFO     | CELERY | Loaded existing global vector store with 73 vectors
+2025-10-11 05:57:50 | INFO     | CELERY | Added 6 chunks from document 3 to global store
+2025-10-11 05:57:50 | INFO     | CELERY | Global store now has 79 total vectors
+2025-10-11 05:57:50 | INFO     | CELERY | Added 6 chunks for document 3
+2025-10-11 05:57:50 | INFO     | CELERY | Loaded existing global vector store with 79 vectors
+2025-10-11 05:57:50 | INFO     | CELERY | Global vector store updated - Total vectors: 79, Total documents: 3
+2025-10-11 05:57:50 | INFO     | CELERY | Finalizing admin document processing...
+2025-10-11 05:57:50 | INFO     | CELERY | Cleared global vector store cache
+2025-10-11 05:57:50 | INFO     | CELERY | Cleared 0 combined user caches due to global cache update
+2025-10-11 05:57:50 | INFO     | CELERY | Cleared global cache after admin document processing
+2025-10-11 05:57:50 | INFO     | CELERY | Admin PDF processing completed successfully for document 3
+2025-10-11 05:57:50 | INFO     | CELERY | Final stats - Global vectors: 79, Document chunks: 6, Language: english

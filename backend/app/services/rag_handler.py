@@ -4,7 +4,7 @@ from langchain_community.vectorstores import FAISS
 from langchain_groq import ChatGroq
 from langchain_huggingface import HuggingFaceEmbeddings
 from loguru import logger
-from ...redis_cache import cache
+from ...memory_cache import cache
 from ...vector_store_db import get_user_vector_store_info
 from .dual_embedding_manager import EmbeddingManager
 from .admin_document_service import GlobalVectorStoreService
@@ -14,11 +14,11 @@ _vector_store_cache = {}  # Keep in-memory cache as fallback
 def load_global_vector_stores():
     """Load the single global vector store containing all admin documents"""
     try:
-        # Check Redis cache for global vector store
+        # Check memory cache for global vector store
         global_cache_key = "global_vectorstore"
         cached_global = cache.get(global_cache_key)
         if cached_global:
-            logger.info("Using Redis cached global vector store")
+            logger.debug("Using cached global vector store")
             return cached_global
         
         # Use the new GlobalVectorStoreManager
@@ -139,23 +139,22 @@ def clear_user_cache(user_id: int):
     cache_key = f"vectorstore_user_{user_id}"
     if cache_key in _vector_store_cache:
         del _vector_store_cache[cache_key]
-        logger.info(f"Cleared old in-memory cache for user {user_id}")
+        logger.debug(f"Cleared old in-memory cache for user {user_id}")
     
     # Clear new combined cache
     combined_cache_key = f"combined_vectorstore_user_{user_id}"
     if combined_cache_key in _vector_store_cache:
         del _vector_store_cache[combined_cache_key]
-        logger.info(f"Cleared combined in-memory cache for user {user_id}")
+        logger.debug(f"Cleared combined in-memory cache for user {user_id}")
     
-    # Clear Redis caches
-    cache.delete(f"vectorstore:user:{user_id}")
-    cache.delete(f"combined_vectorstore:user:{user_id}")
-    logger.info(f"Cleared Redis caches for user {user_id}")
+    # Clear memory caches (pattern matching for user)
+    cache.clear_user_data(user_id)
+    logger.info(f"Cleared caches for user {user_id}")
 
 
 def clear_global_cache():
     """Clear global vector store cache - call when admin documents change"""
-    # Clear global cache from Redis
+    # Clear global cache from memory
     cache.delete("global_vectorstore")
     logger.info("Cleared global vector store cache")
     

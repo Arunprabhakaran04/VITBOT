@@ -46,7 +46,7 @@ export const AdminDashboard = () => {
       id: 'documents' as AdminView,
       label: 'Document Management',
       icon: FileText,
-      description: 'Manage PDF documents and knowledge base'
+      // description: 'Manage PDF documents and knowledge base'
     },
     {
       id: 'users' as AdminView,

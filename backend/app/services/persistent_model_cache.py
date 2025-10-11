@@ -16,7 +16,7 @@ class PersistentModelCache:
     def __init__(self):
         try:
             # Import Redis cache from your existing setup
-            from ....redis_cache import cache
+            from ...memory_cache import cache
             self.cache = cache
             self.cache_prefix = "embedding_model:"
             self.cache_timeout = 3600 * 24  # 24 hours
@@ -39,12 +39,12 @@ class PersistentModelCache:
             cached_data = self.cache.get(key)
             
             if cached_data:
-                logger.info(f"⚡ Found {language} model in Redis cache")
+                logger.info(f"Found {language} model in memory cache")
                 # Note: HuggingFaceEmbeddings objects can't be pickled directly
                 # We'll need to recreate them, but this tells us it was cached
                 return "CACHE_HIT"  # Signal that model should be recreated
             else:
-                logger.info(f"❌ {language} model not found in Redis cache")
+                logger.info(f"{language} model not found in memory cache")
                 return None
                 
         except Exception as e:
@@ -66,7 +66,7 @@ class PersistentModelCache:
             }
             
             self.cache.set(key, model_data, expire=self.cache_timeout)
-            logger.info(f"✅ Cached {language} model metadata in Redis")
+            logger.info(f"Cached {language} model metadata in memory cache")
             
         except Exception as e:
             logger.error(f"Error caching model: {e}")

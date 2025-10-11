@@ -13,11 +13,17 @@ from .enhanced_pdf_extractor import EnhancedPDFExtractor
 from .dual_embedding_manager import EmbeddingManager
 from .language_aware_text_splitter import TextSplitter
 
-# Global cache for embeddings model (legacy - will be replaced by DualEmbeddingManager)
+# Global cache for embeddings model - production-ready singleton pattern
 _embeddings_model = None
+_embeddings_lock = None
 
 class DocumentProcessor:
     def __init__(self, groq_api_key=None):
+        global _embeddings_lock
+        if _embeddings_lock is None:
+            import threading
+            _embeddings_lock = threading.Lock()
+            
         self.api_key = groq_api_key or os.environ.get("GROQ_API_KEY")
         if not self.api_key:
             raise ValueError("GROQ_API_KEY not provided or set in environment")
@@ -35,22 +41,37 @@ class DocumentProcessor:
         self.vector_store_dir = os.path.join(os.path.dirname(__file__), '../../vector_stores')
         os.makedirs(self.vector_store_dir, exist_ok=True)
         
-        logger.info("🚀 DocumentProcessor initialized with English support")
+        logger.info("DocumentProcessor initialized with English support")
 
     def _initialize_embeddings(self):
-        global _embeddings_model
+        """Thread-safe embeddings model initialization"""
+        global _embeddings_model, _embeddings_lock
+        
         if _embeddings_model is None:
-            logger.info("🤖 Initializing embeddings model for the first time - this may take a few minutes...")
-            logger.info("📥 Downloading/loading BAAI/bge-small-en-v1.5 model...")
-            _embeddings_model = HuggingFaceEmbeddings(
-                model_name="BAAI/bge-small-en-v1.5",
-                model_kwargs={"device": "cpu"},
-                encode_kwargs={"normalize_embeddings": True}
-            )
-            logger.success("✅ Embeddings model loaded successfully - subsequent uploads will be faster!")
+            with _embeddings_lock:
+                # Double-check pattern for thread safety
+                if _embeddings_model is None:
+                    logger.info("Initializing embeddings model - this may take a few minutes...")
+                    logger.info("Downloading/loading BAAI/bge-small-en-v1.5 model...")
+                    
+                    try:
+                        _embeddings_model = HuggingFaceEmbeddings(
+                            model_name="BAAI/bge-small-en-v1.5",
+                            model_kwargs={"device": "cpu"},
+                            encode_kwargs={"normalize_embeddings": True}
+                        )
+                        logger.success("Embeddings model loaded successfully!")
+                    except Exception as e:
+                        logger.error(f"Failed to initialize embeddings model: {e}")
+                        raise
         else:
-            logger.info("⚡ Using cached embeddings model - fast loading!")
+            logger.debug("Using cached embeddings model - fast loading!")
         return _embeddings_model
+    
+    @property  
+    def embeddings_model(self):
+        """Property to get embeddings model (for startup initialization)"""
+        return self._initialize_embeddings()
 
     def _initialize_llm(self):
         return ChatGroq(
@@ -83,17 +104,17 @@ class DocumentProcessor:
             
             # Always English now
             language = self.language_detector.detect_language(combined_text)
-            logger.info(f"📝 Detected language: {language}")
+            logger.info(f"Detected language: {language}")
             
             # Get text statistics for debugging
             stats = self.language_detector.get_text_stats(combined_text)
-            logger.info(f"📊 Text stats: {stats['total_chars']} chars, "
+            logger.info(f"Text stats: {stats['total_chars']} chars, "
                        f"English: {stats['english_ratio']:.1%}")
             
             return page_texts, language
             
         except Exception as e:
-            logger.error(f"❌ Error processing PDF {pdf_path}: {e}")
+            logger.error(f"Error processing PDF {pdf_path}: {e}")
             raise e
 
     def split_text_with_metadata(self, page_texts):
@@ -108,12 +129,12 @@ class DocumentProcessor:
                 raise ValueError(f"Text splitting validation failed: {validation.get('reason', 'Unknown error')}")
             
             if 'warning' in validation:
-                logger.warning(f"⚠️ Text splitting warning: {validation['warning']}")
+                logger.warning(f"Text splitting warning: {validation['warning']}")
             
             return chunks_with_metadata
             
         except Exception as e:
-            logger.error(f"❌ Error splitting text with metadata: {e}")
+            logger.error(f"Error splitting text with metadata: {e}")
             raise e
 
     def embed_pdf(self, pdf_path, filename):
@@ -133,7 +154,7 @@ class DocumentProcessor:
             return vector_store, language
             
         except Exception as e:
-            logger.error(f"❌ Error embedding PDF {filename}: {e}")
+            logger.error(f"Error embedding PDF {filename}: {e}")
             raise e
 
     def create_vector_store_with_metadata(self, chunks_with_metadata, language='english'):
@@ -149,11 +170,11 @@ class DocumentProcessor:
             # Create vector store with metadata
             vector_store = FAISS.from_texts(texts, embeddings, metadatas=metadatas)
             
-            logger.info(f"✅ Created {language} vector store with {vector_store.index.ntotal} vectors and metadata")
+            logger.info(f"Created {language} vector store with {vector_store.index.ntotal} vectors and metadata")
             return vector_store
             
         except Exception as e:
-            logger.error(f"❌ Error creating {language} vector store with metadata: {e}")
+            logger.error(f"Error creating {language} vector store with metadata: {e}")
             raise e
 
     # Legacy method for backward compatibility

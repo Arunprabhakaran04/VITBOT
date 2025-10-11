@@ -1,4 +1,4 @@
-from ...redis_cache import cache
+from ...memory_cache import cache
 from typing import Optional, Dict
 from loguru import logger
 import hashlib
@@ -23,7 +23,7 @@ class ChatCache:
             cached = cache.get_json(cache_key)
             
             if cached:
-                logger.info(f"💾 Cache hit for user {user_id} query")
+                logger.info(f"Cache hit for user {user_id} query")
                 return cached
             
             return None
@@ -54,7 +54,7 @@ class ChatCache:
             success = cache.set_json(cache_key, cached_data, expire=expire_time)
             
             if success:
-                logger.info(f"💾 Cached response for user {user_id} with {len(sources) if sources else 0} sources")
+                logger.info(f"Cached response for user {user_id} with {len(sources) if sources else 0} sources")
             
             return success
             

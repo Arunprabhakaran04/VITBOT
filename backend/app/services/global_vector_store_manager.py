@@ -158,6 +158,30 @@ class GlobalVectorStoreManager:
             logger.error(f"Error removing document {document_id} from global store: {e}")
             return False
     
+    def reactivate_document_in_global_store(self, document_id: int) -> bool:
+        """Reactivate a previously deleted document in the global vector store"""
+        try:
+            # Reactivate document chunks in database
+            success = GlobalVectorStoreService.reactivate_document_chunks(document_id)
+            
+            if not success:
+                logger.warning(f"No inactive chunks found to reactivate for document {document_id}")
+                return True  # Not an error if no chunks to reactivate
+            
+            # Rebuild the global vector store to include reactivated chunks
+            rebuild_success = self._rebuild_global_store()
+            
+            if rebuild_success:
+                logger.success(f"Successfully reactivated document {document_id} in global store")
+            else:
+                logger.error(f"Failed to rebuild global store after reactivating document {document_id}")
+            
+            return rebuild_success
+            
+        except Exception as e:
+            logger.error(f"Error reactivating document {document_id} in global store: {e}")
+            return False
+    
     def _rebuild_global_store(self) -> bool:
         """Rebuild the global vector store using only active chunks"""
         try:
@@ -165,6 +189,7 @@ class GlobalVectorStoreManager:
             
             # Get all active chunks
             active_chunks = GlobalVectorStoreService.get_active_document_chunks()
+            logger.info(f"Retrieved {len(active_chunks) if active_chunks else 0} active chunks for rebuild")
             
             if not active_chunks:
                 logger.info("No active chunks found, creating empty global store")
@@ -258,12 +283,13 @@ class GlobalVectorStoreManager:
                 
                 # Get document count
                 cursor.execute("""
-                    SELECT COUNT(DISTINCT document_id) 
+                    SELECT COUNT(DISTINCT document_id) as doc_count
                     FROM document_chunks dc
                     JOIN admin_documents ad ON dc.document_id = ad.id
                     WHERE dc.is_active = true AND ad.is_active = true
                 """)
-                doc_count = cursor.fetchone()[0] or 0
+                result = cursor.fetchone()
+                doc_count = (result['doc_count'] if isinstance(result, dict) else result[0]) or 0
             
             return {
                 'total_vectors': vector_count,
@@ -344,4 +370,37 @@ class GlobalVectorStoreManager:
             
         except Exception as e:
             logger.error(f"Error in complete rebuild: {e}")
+            return False
+    
+    def ensure_vector_store_consistency(self) -> bool:
+        """Ensure vector store is consistent with database state (maintenance operation)"""
+        try:
+            logger.info("Checking vector store consistency with database...")
+            
+            # Get stats before rebuild
+            stats_before = self.get_global_store_stats()
+            db_chunks = GlobalVectorStoreService.get_global_chunk_count()
+            
+            logger.info(f"Before consistency check - Vector store: {stats_before['total_vectors']} vectors, Database: {db_chunks} active chunks")
+            
+            # If there's a mismatch, rebuild
+            if stats_before['total_vectors'] != db_chunks:
+                logger.warning(f"Inconsistency detected! Vector store has {stats_before['total_vectors']} vectors but database has {db_chunks} active chunks")
+                logger.info("Rebuilding vector store to ensure consistency...")
+                
+                success = self._rebuild_global_store()
+                
+                if success:
+                    stats_after = self.get_global_store_stats()
+                    logger.success(f"Consistency restored! Vector store now has {stats_after['total_vectors']} vectors matching {db_chunks} database chunks")
+                else:
+                    logger.error("Failed to restore consistency")
+                
+                return success
+            else:
+                logger.info("Vector store is already consistent with database")
+                return True
+                
+        except Exception as e:
+            logger.error(f"Error ensuring vector store consistency: {e}")
             return False

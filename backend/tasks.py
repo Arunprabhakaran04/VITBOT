@@ -16,11 +16,11 @@ def process_pdf_task(self, user_id: int, file_path: str, filename: str):
     """Enhanced Celery task with language support and improved caching"""
     task_id = self.request.id
     
-    logger.info(f"🚀 Starting PDF processing task for user {user_id} in Celery worker")
-    logger.info(f"📋 Task ID: {task_id}")
-    logger.info(f"📄 File: {filename}")
-    logger.info(f"📂 Path: {file_path}")
-    logger.info(f"🔧 Process ID: {os.getpid()}")  # Show which process is running
+    logger.info(f"Starting PDF processing task for user {user_id} in Celery worker")
+    logger.info(f" Task ID: {task_id}")
+    logger.info(f" File: {filename}")
+    logger.info(f" Path: {file_path}")
+    logger.info(f"Process ID: {os.getpid()}")  # Show which process is running
     
     try:
         # Validate file exists before processing
@@ -134,10 +134,10 @@ def process_admin_pdf_task(self, document_id: int, file_path: str, filename: str
     """Process PDF for admin global knowledge base using single global vector store"""
     task_id = self.request.id
     
-    logger.info(f"🚀 Starting admin PDF processing task for document {document_id}")
-    logger.info(f"📋 Task ID: {task_id}")
-    logger.info(f"📄 File: {filename}")
-    logger.info(f"📂 Path: {file_path}")
+    logger.info(f"Starting admin PDF processing task for document {document_id}")
+    logger.info(f" Task ID: {task_id}")
+    logger.info(f" File: {filename}")
+    logger.info(f" Path: {file_path}")
     
     try:
         # Validate file exists

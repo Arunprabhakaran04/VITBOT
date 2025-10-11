@@ -1,8 +1,7 @@
 from ...database_connection import get_db_connection
 from typing import List, Dict, Optional
 from datetime import datetime, timezone, timedelta
-from ...celery_app import celery_app
-from ...redis_cache import cache
+from ...memory_cache import cache
 
 
 class TaskService:
@@ -96,8 +95,8 @@ class TaskService:
             return cursor.rowcount > 0
     
     @staticmethod
-    def get_task_with_celery_status(task_id: str) -> Optional[Dict]:
-        """Get task from database with live Celery status"""
+    def get_task_info(task_id: str) -> Optional[Dict]:
+        """Get task from database"""
         with get_db_connection() as conn:
             cursor = conn.cursor()
             
@@ -111,27 +110,32 @@ class TaskService:
             if not task:
                 return None
             
-            task_dict = dict(task)
+            return dict(task)
+    
+    @staticmethod
+    def get_task_with_background_status(task_id: str) -> Optional[Dict]:
+        """Get task from database with live background service status"""
+        task_dict = TaskService.get_task_info(task_id)
+        if not task_dict:
+            return None
+        
+        # Get live status from background service
+        try:
+            from .background_task_service import background_service
             
-            # Get live status from Celery
-            try:
-                celery_task = celery_app.AsyncResult(task_id)
+            background_task = background_service.get_task_status(task_id)
+            
+            if background_task:
+                # Map background service status to our status
+                status_mapping = {
+                    'pending': 'queued',
+                    'processing': 'processing', 
+                    'completed': 'completed',
+                    'failed': 'failed'
+                }
                 
-                if celery_task.state == 'PENDING':
-                    live_status = 'queued'
-                    live_message = 'Task is waiting to be processed'
-                elif celery_task.state == 'PROCESSING':
-                    live_status = 'processing'
-                    live_message = celery_task.info.get('message', 'Processing...')
-                elif celery_task.state == 'SUCCESS':
-                    live_status = 'completed'
-                    live_message = 'Task completed successfully'
-                elif celery_task.state == 'FAILURE':
-                    live_status = 'failed'
-                    live_message = str(celery_task.info) if celery_task.info else 'Task failed'
-                else:
-                    live_status = task_dict['status']
-                    live_message = task_dict['progress_message']
+                live_status = status_mapping.get(background_task.status.value, task_dict['status'])
+                live_message = background_task.message or task_dict['progress_message']
                 
                 # Update database if status changed
                 if live_status != task_dict['status']:
@@ -139,11 +143,12 @@ class TaskService:
                 
                 task_dict['status'] = live_status
                 task_dict['progress_message'] = live_message
+                task_dict['progress'] = getattr(background_task, 'progress', 0)
                 
-            except Exception as e:
-                print(f"Error getting Celery status for task {task_id}: {e}")
-            
-            return task_dict
+        except Exception as e:
+            print(f"Error getting background service status for task {task_id}: {e}")
+        
+        return task_dict
     
     @staticmethod
     def cleanup_old_tasks(days_old: int = 30) -> int:
@@ -167,10 +172,10 @@ class TaskService:
         active_tasks = TaskService.get_user_active_tasks(user_id)
         completed_tasks = TaskService.get_user_completed_tasks(user_id)
         
-        # Update active tasks with live Celery status
+        # Update active tasks with live background service status
         updated_active_tasks = []
         for task in active_tasks:
-            updated_task = TaskService.get_task_with_celery_status(task['task_id'])
+            updated_task = TaskService.get_task_with_background_status(task['task_id'])
             if updated_task:
                 updated_active_tasks.append(updated_task)
         

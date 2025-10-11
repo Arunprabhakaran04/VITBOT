@@ -175,14 +175,16 @@ async def get_cache_status(current_user: TokenData = Depends(get_current_user)):
 @router.get("/user_cache_data")
 async def get_user_cache_data(current_user: TokenData = Depends(get_current_user)):
     """Get all cache keys for the current user (for debugging and privacy verification)"""
-    from ...redis_cache import cache
+    from ...memory_cache import cache
     
-    user_keys = cache.get_user_keys(current_user.id)
+    # Use clear_user_data to get count instead of listing keys (privacy)
+    cache_info = cache.get_cache_info()
     
     return {
         "user_id": current_user.id,
-        "total_keys": len(user_keys),
-        "key_samples": user_keys[:10] if len(user_keys) > 10 else user_keys
+        "total_cache_keys": cache_info.get('active_keys', 0),
+        "cache_type": "memory",
+        "message": "Individual user keys not listed for privacy"
     }
 
 @router.post("/clear_pdf")
