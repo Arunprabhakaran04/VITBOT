@@ -8,7 +8,6 @@ import { Mail, Lock, LogIn } from 'lucide-react';
 import { useStore } from '@/lib/store';
 import { useToast } from '@/hooks/use-toast';
 import { authAPI } from '@/lib/api';
-import { QuickLogin } from './QuickLogin';
 
 export const LoginForm = () => {
   const [email, setEmail] = useState('');
@@ -128,14 +127,6 @@ export const LoginForm = () => {
           Forgot your password?
         </button>
       </div>
-
-      {/* Quick Login for Development */}
-      <QuickLogin 
-        onFillCredentials={(email, password) => {
-          setEmail(email);
-          setPassword(password);
-        }}
-      />
     </form>
   );
 };
