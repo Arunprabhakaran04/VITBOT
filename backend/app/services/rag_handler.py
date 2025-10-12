@@ -1,9 +1,13 @@
 import os
+from dotenv import load_dotenv
 from langchain.chains import RetrievalQA
 from langchain_community.vectorstores import FAISS
 from langchain_groq import ChatGroq
 from langchain_huggingface import HuggingFaceEmbeddings
 from loguru import logger
+
+# Load environment variables from .env file
+load_dotenv()
 from ...memory_cache import cache
 from ...vector_store_db import get_user_vector_store_info
 from .dual_embedding_manager import EmbeddingManager
@@ -25,6 +29,15 @@ def load_global_vector_stores():
         from .global_vector_store_manager import GlobalVectorStoreManager
         global_manager = GlobalVectorStoreManager()
         
+        # Ensure vector store consistency before loading
+        consistency_check = global_manager.ensure_vector_store_consistency()
+        if not consistency_check:
+            logger.warning("Vector store consistency check failed, attempting to rebuild...")
+            rebuild_success = global_manager._rebuild_global_store()
+            if not rebuild_success:
+                logger.error("Failed to rebuild global vector store")
+                return None
+        
         # Check if global vector store exists
         stats = global_manager.get_global_store_stats()
         
@@ -39,10 +52,23 @@ def load_global_vector_stores():
             logger.info("Global vector store is empty")
             return None
         
-        # Cache the global vector store
-        cache.set(global_cache_key, vectorstore, expire=3600)  # Cache for 1 hour
+        # Verify the loaded vector store has the expected number of vectors
+        if vectorstore.index.ntotal != stats['total_vectors']:
+            logger.warning(f"Mismatch detected: loaded {vectorstore.index.ntotal} vectors but stats show {stats['total_vectors']}")
+            # Force rebuild and reload
+            logger.info("Forcing rebuild due to mismatch...")
+            rebuild_success = global_manager._rebuild_global_store()
+            if rebuild_success:
+                vectorstore = global_manager.get_vectorstore()
+                logger.info(f"Reloaded after rebuild: {vectorstore.index.ntotal} vectors")
+            else:
+                logger.error("Rebuild failed")
+                return None
         
-        logger.success(f"Successfully loaded global vector store with {vectorstore.index.ntotal} total vectors from {stats['total_documents']} documents")
+        # Cache the global vector store (shorter cache time for more frequent updates)
+        cache.set(global_cache_key, vectorstore, expire=1800)  # Cache for 30 minutes
+        
+        logger.info(f"Successfully loaded global vector store with {vectorstore.index.ntotal} total vectors from {stats['total_documents']} documents")
         
         return vectorstore
         
@@ -56,14 +82,15 @@ def load_vectorstore_for_user(user_id: int):
         # Check combined cache first
         combined_cache_key = f"combined_vectorstore_user_{user_id}"
         if combined_cache_key in _vector_store_cache:
-            logger.info(f"Using in-memory cached combined vector store for user {user_id}")
-            return _vector_store_cache[combined_cache_key]
+            cached_store = _vector_store_cache[combined_cache_key]
+            logger.info(f"Using in-memory cached combined vector store for user {user_id} ({cached_store.index.ntotal} vectors)")
+            return cached_store
         
-        # Check Redis cache second
+        # Check memory cache second
         combined_redis_key = f"combined_vectorstore:user:{user_id}"
         cached_combined = cache.get(combined_redis_key)
         if cached_combined:
-            logger.info(f"Using Redis cached combined vector store for user {user_id}")
+            logger.info(f"Using memory cached combined vector store for user {user_id}")
             _vector_store_cache[combined_cache_key] = cached_combined
             return cached_combined
         
@@ -91,35 +118,41 @@ def load_vectorstore_for_user(user_id: int):
                 )
                 logger.info(f"Loaded user vector store for user {user_id} with {user_vectorstore.index.ntotal} vectors")
         
-        # Load global/admin vector stores
+        # Load global/admin vector stores (this is the critical part)
         global_vectorstore = load_global_vector_stores()
         
-        # Combine vector stores
-        if user_vectorstore and global_vectorstore:
-            # User has documents + global documents
-            combined_vectorstore = user_vectorstore
-            combined_vectorstore.merge_from(global_vectorstore)
-            total_vectors = combined_vectorstore.index.ntotal
-            logger.success(f"Combined user + global vector stores for user {user_id}: {total_vectors} total vectors")
-            
-        elif global_vectorstore:
-            # Only global documents (most common case for regular users)
-            combined_vectorstore = global_vectorstore
-            logger.info(f"Using only global vector stores for user {user_id}: {global_vectorstore.index.ntotal} vectors")
-            
-        elif user_vectorstore:
-            # Only user documents (fallback)
-            combined_vectorstore = user_vectorstore
-            logger.info(f"Using only user vector store for user {user_id}: {user_vectorstore.index.ntotal} vectors")
-            
+        if not global_vectorstore:
+            logger.warning(f"No global vector store available - this means no admin documents are processed")
+            if user_vectorstore:
+                logger.info(f"Using only user vector store for user {user_id}: {user_vectorstore.index.ntotal} vectors")
+                combined_vectorstore = user_vectorstore
+            else:
+                logger.warning(f"No vector stores available for user {user_id}")
+                return None
         else:
-            # No documents available
-            logger.warning(f"No vector stores available for user {user_id}")
+            # Combine vector stores
+            if user_vectorstore:
+                # User has documents + global documents
+                logger.info(f"Combining user store ({user_vectorstore.index.ntotal} vectors) with global store ({global_vectorstore.index.ntotal} vectors)")
+                combined_vectorstore = user_vectorstore
+                combined_vectorstore.merge_from(global_vectorstore)
+                total_vectors = combined_vectorstore.index.ntotal
+                logger.info(f"Combined user + global vector stores for user {user_id}: {total_vectors} total vectors")
+                
+            else:
+                # Only global documents (most common case for regular users)
+                combined_vectorstore = global_vectorstore
+                logger.info(f"Using only global vector stores for user {user_id}: {global_vectorstore.index.ntotal} vectors")
+        
+        if not combined_vectorstore:
+            logger.error(f"Failed to create combined vector store for user {user_id}")
             return None
         
         # Cache the combined vector store
         _vector_store_cache[combined_cache_key] = combined_vectorstore
         cache.set(combined_redis_key, combined_vectorstore, expire=1800)  # Cache for 30 minutes
+        
+        logger.info(f"Successfully created and cached combined vector store for user {user_id} with {combined_vectorstore.index.ntotal} total vectors")
         
         return combined_vectorstore
         
@@ -164,9 +197,17 @@ def clear_global_cache():
     for key in keys_to_remove:
         del _vector_store_cache[key]
     
-    # Clear all combined caches from Redis
-    cache.clear_pattern("combined_vectorstore:user:*")
+    # Clear all combined caches from memory cache
+    cleared_count = cache.clear_pattern("combined_vectorstore:user:*")
+    
+    # Also clear any old-style user caches that might exist
+    cleared_count += cache.clear_pattern("vectorstore:user:*")
+    
     logger.info(f"Cleared {len(keys_to_remove)} combined user caches due to global cache update")
+    logger.info(f"Total cache entries cleared: {cleared_count}")
+    
+    # Force consistency check on next load
+    cache.delete("global_store_consistency_checked")
 
 
 def clear_all_cache():
@@ -211,7 +252,7 @@ def get_user_query_response(vectorstore, query):
         llm = ChatGroq(model_name="llama-3.3-70b-versatile", temperature=0.1)
         qa_chain = RetrievalQA.from_chain_type(
             llm=llm, 
-            retriever=vectorstore.as_retriever(search_kwargs={"k": 4}),
+            retriever=vectorstore.as_retriever(search_kwargs={"k": 6}),
             return_source_documents=True  # Enable source documents return
         )
         result = qa_chain.invoke(query)
@@ -222,9 +263,19 @@ def get_user_query_response(vectorstore, query):
             seen_sources = set()  # To avoid duplicate sources
             for doc in result['source_documents']:
                 if hasattr(doc, 'metadata') and doc.metadata:
+                    # Use filename if available (cleaner), otherwise extract from source path
+                    document_name = doc.metadata.get('filename', 'Unknown Document')
+                    if document_name == 'Unknown Document' and 'source' in doc.metadata:
+                        # Extract filename from full path
+                        import os
+                        document_name = os.path.basename(doc.metadata['source'])
+                    
+                    # Use page_number (from enhanced chunker) instead of page
+                    page_num = doc.metadata.get('page_number', doc.metadata.get('page', 'Unknown Page'))
+                    
                     source_info = {
-                        'document': doc.metadata.get('source', 'Unknown Document'),
-                        'page': doc.metadata.get('page', 'Unknown Page'),
+                        'document': document_name,
+                        'page': page_num,
                         'chunk_index': doc.metadata.get('chunk_index', 1)
                     }
                     # Create a unique identifier for the source

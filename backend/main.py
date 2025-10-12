@@ -2,6 +2,10 @@ import os
 import sys
 import logging
 from pathlib import Path
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
 from fastapi import FastAPI
 from backend.app.routers import users, chat_rbac as chat, pdf_celery as pdf, admin
 from backend.database_connection import get_connection_pool, close_connection_pool

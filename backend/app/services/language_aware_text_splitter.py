@@ -1,12 +1,12 @@
 from langchain.text_splitter import RecursiveCharacterTextSplitter
-from typing import List
+from typing import List, Dict, Any
 import logging
 
 logger = logging.getLogger(__name__)
 
 class TextSplitter:
     """
-    Text splitter that handles English text
+    Text splitter that handles English text with enhanced chunk processing
     """
     
     def __init__(self):
@@ -22,7 +22,7 @@ class TextSplitter:
             " "      # Space (last resort)
         ]
         
-        logger.info("Initialized Text Splitter")
+        logger.info("Initialized Enhanced Text Splitter")
     
     def split_text(self, text: str) -> List[str]:
         """
@@ -99,6 +99,7 @@ class TextSplitter:
                     chunk_metadata = page_metadata.copy()
                     chunk_metadata['chunk_index'] = chunk_idx + 1
                     chunk_metadata['chunks_on_page'] = len(page_chunks)
+                    chunk_metadata['chunk_type'] = 'text'  # Add chunk type for consistency
                     
                     all_chunks_with_metadata.append({
                         'text': chunk,
@@ -121,6 +122,35 @@ class TextSplitter:
         except Exception as e:
             logger.error(f"Error splitting English text with metadata: {e}")
             raise e
+    
+    def split_enhanced_chunks_with_metadata(self, enhanced_chunks: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+        """
+        Convert enhanced PDF chunks to the format expected by the vector store
+        enhanced_chunks: List of dicts from enhanced_pdf_chunker with 'content', 'metadata', etc.
+        Returns: List of dicts with 'text' and 'metadata' keys for vector store creation
+        """
+        logger.info(f"Processing {len(enhanced_chunks)} enhanced chunks for vector store")
+        
+        converted_chunks = []
+        
+        for chunk in enhanced_chunks:
+            # Convert enhanced chunk format to expected format
+            converted_chunk = {
+                'text': chunk['content'],
+                'metadata': chunk['metadata'].copy()
+            }
+            
+            # Add additional metadata from enhanced chunker
+            if 'chunk_type' in chunk:
+                converted_chunk['metadata']['chunk_type'] = chunk['chunk_type']
+            if 'chunk_id' in chunk:
+                converted_chunk['metadata']['chunk_id'] = chunk['chunk_id']
+            
+            converted_chunks.append(converted_chunk)
+        
+        logger.info(f"Converted {len(converted_chunks)} enhanced chunks to vector store format")
+        
+        return converted_chunks
     
     def validate_chunks(self, chunks: List[str]) -> dict:
         """

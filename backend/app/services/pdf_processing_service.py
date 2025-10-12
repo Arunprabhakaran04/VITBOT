@@ -74,28 +74,19 @@ class PDFProcessingService:
             
             processor = DocumentProcessor()
             
-            # Extract text from PDF
-            logger.info("Loading and extracting text from PDF...")
-            background_service.update_task_progress(task_id, 30, "Loading and extracting text from PDF...")
-            TaskService.update_task_status(task_id, 'processing', 'Loading and extracting text from PDF...')
+            # Extract text and tables from PDF using enhanced chunking
+            logger.info("Processing PDF with enhanced chunking (text + tables)...")
+            background_service.update_task_progress(task_id, 30, "Processing PDF with enhanced chunking...")
+            TaskService.update_task_status(task_id, 'processing', 'Processing PDF with enhanced chunking...')
             
-            page_texts, language = processor.process_pdf(file_path, filename)
-            total_chars = sum(len(page['text']) for page in page_texts)
-            logger.info(f"PDF text extracted successfully - {total_chars} characters from {len(page_texts)} pages, Language: {language}")
+            # Use the new main enhanced processing method
+            vector_store, language = processor.create_embeddings_from_pdf(file_path, filename)
             
-            # Split text into chunks
-            logger.info(f"Splitting {language} text into chunks...")
-            background_service.update_task_progress(task_id, 50, f"Splitting {language} text into chunks...")
-            TaskService.update_task_status(task_id, 'processing', f'Splitting {language} text into chunks...')
-            chunks_with_metadata = processor.split_text_with_metadata(page_texts)
-            logger.info(f"Text split into {len(chunks_with_metadata)} chunks for {language} processing")
+            logger.info(f"Enhanced PDF processing completed - {vector_store.index.ntotal} vectors created, Language: {language}")
             
-            # Create embeddings and vector store
-            logger.info(f"Creating {language} embeddings...")
-            background_service.update_task_progress(task_id, 70, f"Creating {language} embeddings...")
-            TaskService.update_task_status(task_id, 'processing', f'Creating {language} embeddings...')
-            vector_store = processor.create_vector_store_with_metadata(chunks_with_metadata, language)
-            logger.info(f"Vector store created with {vector_store.index.ntotal} vectors using {language} embeddings")
+            # Update progress
+            background_service.update_task_progress(task_id, 70, f"Enhanced {language} processing completed")
+            TaskService.update_task_status(task_id, 'processing', f'Enhanced {language} processing completed')
 
             vector_store_dir = os.path.join(processor.vector_store_dir, f"user_{user_id}")
             os.makedirs(vector_store_dir, exist_ok=True)
@@ -128,7 +119,7 @@ class PDFProcessingService:
             TaskService.update_task_status(task_id, 'completed', f'{language.title()} PDF processed successfully')
 
             logger.info(f"{language.title()} PDF processing completed successfully for user {user_id}")
-            logger.info(f"Final stats: {vector_store.index.ntotal} vectors, {len(chunks_with_metadata)} chunks, Language: {language}")
+            logger.info(f"Final stats: {vector_store.index.ntotal} vectors, Language: {language}")
 
             return {
                 'status': 'completed',
@@ -136,7 +127,7 @@ class PDFProcessingService:
                 'vector_count': vector_store.index.ntotal,
                 'language': language,
                 'embedding_model': embedding_model,
-                'chunks_count': len(chunks_with_metadata)
+                'chunks_count': vector_store.index.ntotal  # Vector count equals chunk count
             }
             
         except Exception as e:
@@ -174,21 +165,22 @@ class PDFProcessingService:
             
             processor = DocumentProcessor()
             
-            # Extract and process PDF
-            logger.info("Loading and extracting text from admin PDF...")
-            background_service.update_task_progress(task_id, 30, "Loading and extracting text...")
-            TaskService.update_task_status(task_id, 'processing', 'Loading and extracting text...')
+            # Extract and process PDF with enhanced chunking  
+            logger.info("Processing admin PDF with enhanced chunking (text + tables)...")
+            background_service.update_task_progress(task_id, 30, "Processing admin PDF with enhanced chunking...")
+            TaskService.update_task_status(task_id, 'processing', 'Processing admin PDF with enhanced chunking...')
             
-            page_texts, language = processor.process_pdf(file_path, filename)
-            total_chars = sum(len(page['text']) for page in page_texts)
-            logger.info(f"Admin PDF text extracted - {total_chars} characters from {len(page_texts)} pages, Language: {language}")
+            # Get enhanced chunks for admin processing
+            enhanced_chunks = processor.process_pdf_with_enhanced_chunking(file_path, filename)
+            total_chars = sum(len(chunk['text']) for chunk in enhanced_chunks)
+            language = 'english'  # Always English
             
-            # Split text into chunks
-            logger.info(f"Splitting {language} text into chunks...")
-            background_service.update_task_progress(task_id, 50, f"Splitting {language} text into chunks...")
-            TaskService.update_task_status(task_id, 'processing', f'Splitting {language} text into chunks...')
-            chunks_with_metadata = processor.split_text_with_metadata(page_texts)
-            logger.info(f"Text split into {len(chunks_with_metadata)} chunks for admin document")
+            logger.info(f"Admin enhanced PDF processing completed - {total_chars} characters from {len(enhanced_chunks)} chunks, Language: {language}")
+            
+            # Enhanced chunks are already in the right format for vector store
+            chunks_with_metadata = enhanced_chunks
+            background_service.update_task_progress(task_id, 50, f"Enhanced {language} chunks prepared")
+            TaskService.update_task_status(task_id, 'processing', f'Enhanced {language} chunks prepared')
             
             # Add directly to global vector store
             logger.info("Adding chunks directly to global vector store...")
@@ -215,7 +207,7 @@ class PDFProcessingService:
             embedding_model = EmbeddingManager.MODEL
 
             # Update admin document record with text preview
-            extracted_text = "\n".join([page['text'] for page in page_texts])
+            extracted_text = "\n".join([chunk['text'] for chunk in chunks_with_metadata])
             text_preview = extracted_text[:1000] if len(extracted_text) > 1000 else extracted_text
             AdminDocumentService.update_document_processing_status(
                 document_id, 

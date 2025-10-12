@@ -189,54 +189,80 @@ class GlobalVectorStoreManager:
             
             # Get all active chunks
             active_chunks = GlobalVectorStoreService.get_active_document_chunks()
-            logger.info(f"Retrieved {len(active_chunks) if active_chunks else 0} active chunks for rebuild")
+            chunk_count = len(active_chunks) if active_chunks else 0
+            logger.info(f"Retrieved {chunk_count} active chunks for rebuild")
+            
+            # Create the directory if it doesn't exist
+            os.makedirs(self.global_store_path, exist_ok=True)
             
             if not active_chunks:
-                logger.info("No active chunks found, creating empty global store")
-                # Create empty store
+                logger.warning("No active chunks found, creating minimal global store")
+                # Create minimal store with dummy content
                 embeddings = EmbeddingManager.get_embeddings_static()
-                dummy_texts = ["Empty global vector store"]
-                dummy_metadatas = [{"document": "system", "temporary": True}]
+                dummy_texts = ["System: No documents available. Please upload admin documents."]
+                dummy_metadatas = [{"document": "system", "temporary": True, "document_id": -1}]
                 
                 empty_store = FAISS.from_texts(dummy_texts, embeddings, metadatas=dummy_metadatas)
                 empty_store.save_local(self.global_store_path, index_name="index")
                 
+                logger.info("Created minimal global store")
                 return True
             
             # Rebuild from active chunks
             texts = []
             metadatas = []
             
-            for chunk in active_chunks:
-                texts.append(chunk['chunk_text'])
+            logger.info(f"Processing {chunk_count} active chunks for rebuild...")
+            
+            for i, chunk in enumerate(active_chunks):
+                chunk_text = chunk.get('chunk_text', '').strip()
+                if not chunk_text:
+                    logger.warning(f"Empty chunk text for chunk ID {chunk.get('id', 'unknown')}, skipping")
+                    continue
+                    
+                texts.append(chunk_text)
                 
                 # Parse metadata from JSONB
                 metadata = chunk.get('metadata', {})
                 if isinstance(metadata, str):
                     try:
                         metadata = json.loads(metadata)
-                    except:
+                    except json.JSONDecodeError:
+                        logger.warning(f"Failed to parse metadata for chunk {chunk.get('id')}, using empty dict")
                         metadata = {}
                 
-                # Ensure document_id is in metadata
+                # Ensure required metadata fields
                 metadata['document_id'] = chunk['document_id']
-                metadata['chunk_index'] = chunk['chunk_index']
-                metadata['global_chunk_id'] = f"doc_{chunk['document_id']}_chunk_{chunk['chunk_index']}"
+                metadata['chunk_index'] = chunk.get('chunk_index', i)
+                metadata['global_chunk_id'] = f"doc_{chunk['document_id']}_chunk_{chunk.get('chunk_index', i)}"
                 metadata['filename'] = chunk.get('filename', 'Unknown')
+                metadata['source'] = chunk.get('filename', 'Unknown')  # For compatibility
                 
                 metadatas.append(metadata)
             
+            if not texts:
+                logger.error("No valid chunk texts found after processing")
+                return False
+            
             # Create new global store
+            logger.info(f"Creating FAISS vector store from {len(texts)} chunks...")
             embeddings = EmbeddingManager.get_embeddings_static()
             new_global_store = FAISS.from_texts(texts, embeddings, metadatas=metadatas)
             
             # Save the rebuilt store
+            logger.info(f"Saving rebuilt vector store to {self.global_store_path}...")
             new_global_store.save_local(self.global_store_path, index_name="index")
             
             # Update vector indices in database
             self._update_chunk_vector_indices(active_chunks)
             
-            logger.success(f"Rebuilt global vector store with {len(active_chunks)} active chunks")
+            logger.info(f"Successfully rebuilt global vector store with {len(texts)} active chunks")
+            
+            # Verify the rebuild
+            verification_store = self._load_or_create_global_store()
+            actual_vectors = verification_store.index.ntotal
+            logger.info(f"Verification: Rebuilt store contains {actual_vectors} vectors")
+            
             return True
             
         except Exception as e:

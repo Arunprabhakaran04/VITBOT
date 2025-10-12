@@ -6,6 +6,7 @@ from fastapi.security import OAuth2PasswordBearer
 from typing import List
 import os
 import shutil
+from datetime import datetime
 from loguru import logger
 
 from ...oauth2 import get_current_admin_user
@@ -371,3 +372,83 @@ async def get_system_health(current_admin: TokenData = Depends(get_current_admin
         },
         "message": "Background processing system is operational" if background_service.running else "Background processing system is not running"
     }
+
+@router.get("/system/vector_store_debug")
+async def get_vector_store_debug(current_admin: TokenData = Depends(get_current_admin_user)):
+    """Debug information about global vector store"""
+    try:
+        from ..services.global_vector_store_manager import GlobalVectorStoreManager
+        from ..services.rag_handler import get_cache_info, load_global_vector_stores
+        
+        global_manager = GlobalVectorStoreManager()
+        
+        # Get database stats
+        stats = global_manager.get_global_store_stats()
+        
+        # Get cache info
+        cache_info = get_cache_info()
+        
+        # Try to load the global vector store
+        vectorstore = load_global_vector_stores()
+        loaded_vectors = vectorstore.index.ntotal if vectorstore else 0
+        
+        # Check consistency
+        consistency_ok = stats['total_vectors'] == loaded_vectors
+        
+        return {
+            "database_stats": stats,
+            "loaded_vectors": loaded_vectors,
+            "consistency_check": {
+                "is_consistent": consistency_ok,
+                "database_vectors": stats['total_vectors'],
+                "loaded_vectors": loaded_vectors,
+                "difference": abs(stats['total_vectors'] - loaded_vectors)
+            },
+            "cache_info": cache_info,
+            "recommendations": [
+                "Vector store is consistent" if consistency_ok else "Vector store needs rebuild",
+                "Cache is working properly" if cache_info['redis']['connected'] else "Cache connection issues"
+            ]
+        }
+        
+    except Exception as e:
+        logger.error(f"Error getting vector store debug info: {e}")
+        return {
+            "error": str(e),
+            "message": "Failed to get debug information"
+        }
+
+@router.post("/system/rebuild_vector_store")
+async def rebuild_vector_store(current_admin: TokenData = Depends(get_current_admin_user)):
+    """Force rebuild of the global vector store (maintenance operation)"""
+    try:
+        from ..services.global_vector_store_manager import GlobalVectorStoreManager
+        from ..services.rag_handler import clear_global_cache
+        
+        global_manager = GlobalVectorStoreManager()
+        
+        # Clear all caches first
+        clear_global_cache()
+        logger.info("Cleared all caches before rebuild")
+        
+        # Rebuild the vector store
+        success = global_manager._rebuild_global_store()
+        
+        if not success:
+            raise HTTPException(status_code=500, detail="Failed to rebuild vector store")
+        
+        # Get updated stats
+        stats = global_manager.get_global_store_stats()
+        
+        logger.info(f"Vector store rebuild completed by admin user {current_admin.id}")
+        
+        return {
+            "message": "Vector store rebuilt successfully",
+            "stats": stats,
+            "rebuilt_by": current_admin.id,
+            "timestamp": datetime.now().isoformat()
+        }
+        
+    except Exception as e:
+        logger.error(f"Error rebuilding vector store: {e}")
+        raise HTTPException(status_code=500, detail=f"Failed to rebuild vector store: {str(e)}")
