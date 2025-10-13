@@ -1,0 +1,41 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+build/
+dist/
+.pytest_cache/
+.mypy_cache/
+
+# Logs and runtime data
+**/*.log
+logs/
+backend/logs/
+backend/vitbot.log
+backend/vitbot_detailed.log
+
+# Local data folders not needed in image
+uploads/
+backend/uploads/
+temp_uploads/
+backend/temp_uploads/
+vector_stores/
+backend/vector_stores/
+
+# VCS
+.git
+.gitignore
+
+# Node
+frontend/node_modules/
+frontend/.vite/
+frontend/dist/
+frontend/bun.lockb
+
+# Env files (we bake env via build args)
+.env
+backend/.env
