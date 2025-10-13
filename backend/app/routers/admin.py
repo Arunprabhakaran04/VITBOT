@@ -44,7 +44,8 @@ async def upload_admin_document(
     current_admin: TokenData = Depends(get_current_admin_user)
 ):
     """Upload PDF document to admin knowledge base"""
-    if not file.filename.endswith(".pdf"):
+    # Enforce extension and basic mime check
+    if not file.filename.lower().endswith(".pdf"):
         raise HTTPException(status_code=400, detail="Only PDF files are allowed.")
 
     try:
@@ -53,6 +54,9 @@ async def upload_admin_document(
         # Validate file size
         file_size = 0
         content = await file.read()
+        # Check PDF signature (%PDF-)
+        if not content.startswith(b"%PDF-"):
+            raise HTTPException(status_code=400, detail="Invalid PDF file")
         file_size = len(content)
         
         if file_size > settings.get_max_file_size_bytes():
@@ -74,7 +78,11 @@ async def upload_admin_document(
         # Generate unique filename
         from datetime import datetime
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        safe_filename = f"{timestamp}_{file.filename.replace(' ', '_')}"
+        # Basic filename sanitization: keep only safe chars
+        import re
+        original = file.filename
+        basename = re.sub(r"[^A-Za-z0-9._-]", "_", original)
+        safe_filename = f"{timestamp}_{basename}"
         file_path = os.path.join(admin_upload_dir, safe_filename)
         
         # Save file

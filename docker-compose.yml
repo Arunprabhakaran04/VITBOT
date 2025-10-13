@@ -1,0 +1,66 @@
+version: "3.9"
+
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: vitbot-db
+    environment:
+      POSTGRES_DB: VITBOT
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      # Seed schema on first run
+      - ./backend/migrations:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  backend:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    container_name: vitbot-backend
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "8000:8000"
+    # Use env_file to supply runtime environment variables. Create/edit backend/.env
+    env_file:
+      - backend/.env
+    volumes:
+      - uploads_data:/app/uploads
+      - vector_data:/app/vector_stores
+      - backend_logs:/app/logs
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  pgdata:
+    driver: local
+  uploads_data:
+    driver: local
+  vector_data:
+    driver: local
+  backend_logs:
+    driver: local
+# Optional: Frontend dev server (Vite). Uncomment to run alongside backend
+#  frontend:
+#    build:
+#      context: ./frontend
+#      dockerfile: Dockerfile
+#    container_name: vitbot-frontend
+#    ports:
+#      - "5173:5173"
+#    depends_on:
+#      - backend
+#    restart: unless-stopped

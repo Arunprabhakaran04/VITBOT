@@ -6,14 +6,17 @@ from dotenv import load_dotenv
 
 # Load environment variables from .env file
 load_dotenv()
-from fastapi import FastAPI
+from fastapi import FastAPI, Depends
 from backend.app.routers import users, chat_rbac as chat, pdf_celery as pdf, admin
-from backend.database_connection import get_connection_pool, close_connection_pool
+from backend.database_connection import get_connection_pool, close_connection_pool, is_db_connected
 from backend.app.services.background_task_service import background_service
 from backend.app.services.pdf_processing_service import pdf_processing_service
 from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 from loguru import logger
+from backend.app.middleware.admin_middleware import AdminAuthMiddleware
+from backend.app.middleware.user_middleware import require_authenticated_user, require_user_role
+from backend.app.middleware.rate_limiter import RateLimitMiddleware
 
 # Configure production-ready logging (Windows-compatible)
 import sys
@@ -63,9 +66,13 @@ async def lifespan(app: FastAPI):
             Path(dir_path).mkdir(parents=True, exist_ok=True)
         logger.info("Required directories created/verified")
         
-        # Initialize database connection pool
-        get_connection_pool()
-        logger.info("Database connection pool initialized")
+        # Initialize database connection pool (single initialization on startup)
+        try:
+            get_connection_pool()
+            logger.info("Database connection pool initialized")
+        except Exception as e:
+            logger.error(f"Failed to initialize database connection pool at startup: {e}")
+            raise
         
         # Initialize embeddings model at startup (production-ready approach)
         logger.info("Initializing embeddings model - this may take a few minutes on first run...")
@@ -129,10 +136,19 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# Simple in-memory rate limiter (5 requests per second per client)
+app.add_middleware(RateLimitMiddleware, calls=5, period=1.0)
+
+# Admin auth middleware enforces admin role for /admin paths
+app.add_middleware(AdminAuthMiddleware)
+
 # Include all routers
 app.include_router(users.router)
-app.include_router(chat.router) 
-app.include_router(pdf.router)
+
+# Protect the chat router under '/user/chat' so only authenticated users with role='user' can access
+app.include_router(chat.router, prefix="/user/chat", dependencies=[Depends(require_user_role)])
+
+# app.include_router(pdf.router)
 app.include_router(admin.router)
 
 @app.get("/health")
@@ -147,7 +163,7 @@ async def health_check():
             "worker_count": background_service.max_workers,
             "queue_size": background_service.get_queue_size()
         },
-        "database": "connected" if get_connection_pool() else "disconnected"
+    "database": "connected" if is_db_connected() else "disconnected"
     }
 
 @app.get("/")

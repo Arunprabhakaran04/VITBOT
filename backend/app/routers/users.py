@@ -50,10 +50,9 @@ async def login_user(userdata : UserLogin):
         cursor = conn.cursor()
         cursor.execute("SELECT * FROM users WHERE email = %s",(userdata.email,))
         user = cursor.fetchone()
-        if user is None:
-            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="User not found")
-        if not verify(userdata.password, user["password"]):
-            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail = "password incorrect")
+        # Use generic error messages to avoid user enumeration
+        if user is None or not verify(userdata.password, user["password"]):
+            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Invalid credentials")
         else:
             access_token = create_access_token(data = {
                 "user_id" : user["id"], 
