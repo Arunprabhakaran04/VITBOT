@@ -173,7 +173,10 @@ class PDFProcessingService:
             # Get enhanced chunks for admin processing
             enhanced_chunks = processor.process_pdf_with_enhanced_chunking(file_path, filename)
             total_chars = sum(len(chunk['text']) for chunk in enhanced_chunks)
-            language = 'english'  # Always English
+            
+            # Detect language from combined text
+            combined_text = ' '.join([chunk['text'] for chunk in enhanced_chunks])
+            language = processor.language_detector.detect_language(combined_text)
             
             logger.info(f"Admin enhanced PDF processing completed - {total_chars} characters from {len(enhanced_chunks)} chunks, Language: {language}")
             

@@ -452,3 +452,52 @@ async def rebuild_vector_store(current_admin: TokenData = Depends(get_current_ad
     except Exception as e:
         logger.error(f"Error rebuilding vector store: {e}")
         raise HTTPException(status_code=500, detail=f"Failed to rebuild vector store: {str(e)}")
+
+@router.get("/system/multilingual_status")
+async def get_multilingual_status(current_admin: TokenData = Depends(get_current_admin_user)):
+    """Get multilingual RAG system status including model cache and namespaces"""
+    try:
+        from ..services.dual_embedding_manager import EmbeddingManager
+        from ..services.multilingual_vector_store_manager import MultilingualVectorStoreManager
+        
+        # Get embedding cache status
+        cache_status = EmbeddingManager.get_cache_status()
+        
+        # Get namespace statistics
+        multilingual_manager = MultilingualVectorStoreManager()
+        namespace_stats = multilingual_manager.get_all_namespaces_stats()
+        
+        return {
+            "multilingual_support": {
+                "enabled": True,
+                "supported_languages": ["English", "Tamil", "Hindi", "Telugu", "Kannada", "Malayalam", "Bengali", "Marathi", "Gujarati", "Punjabi", "Urdu"]
+            },
+            "embedding_models": {
+                "english": {
+                    "model": EmbeddingManager.ENGLISH_MODEL,
+                    "dimensions": EmbeddingManager.ENGLISH_DIMENSIONS,
+                    "namespace": "english_docs",
+                    "cached": "english" in cache_status['cached_languages']
+                },
+                "multilingual": {
+                    "model": EmbeddingManager.MULTILINGUAL_MODEL,
+                    "dimensions": EmbeddingManager.MULTILINGUAL_DIMENSIONS,
+                    "namespace": "multilingual_docs",
+                    "cached": "multilingual" in cache_status['cached_languages']
+                }
+            },
+            "cache_status": cache_status,
+            "namespaces": namespace_stats,
+            "features": [
+                "Automatic language detection for documents",
+                "Automatic language detection for queries",
+                "Separate vector stores for English and multilingual content",
+                "Optimized embedding models (384D for English, 1024D for multilingual)",
+                "Namespace-based retrieval routing",
+                "Detailed logging of language and model usage"
+            ]
+        }
+        
+    except Exception as e:
+        logger.error(f"Error getting multilingual status: {e}")
+        raise HTTPException(status_code=500, detail=f"Failed to get multilingual status: {str(e)}")

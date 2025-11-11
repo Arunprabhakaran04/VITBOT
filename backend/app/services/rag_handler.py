@@ -12,8 +12,16 @@ from ...memory_cache import cache
 from ...vector_store_db import get_user_vector_store_info
 from .dual_embedding_manager import EmbeddingManager
 from .admin_document_service import GlobalVectorStoreService
+from .language_service import LanguageDetector
+from .multilingual_vector_store_manager import MultilingualVectorStoreManager
+from .enhanced_retrieval import create_enhanced_retriever
+from .enhanced_retrieval import create_enhanced_retriever
 
 _vector_store_cache = {}  # Keep in-memory cache as fallback
+
+# Initialize language detector for query routing
+_language_detector = LanguageDetector()
+_multilingual_manager = MultilingualVectorStoreManager()
 
 def load_global_vector_stores():
     """Load the single global vector store containing all admin documents"""
@@ -247,12 +255,49 @@ def get_cache_info():
     }
 
 
-def get_user_query_response(vectorstore, query):
+def get_user_query_response(vectorstore, query, use_enhanced_retrieval=False):
+    """
+    Process user query with automatic language detection and namespace routing
+    
+    Args:
+        vectorstore: FAISS vectorstore
+        query: User query string
+        use_enhanced_retrieval: If True, uses Fix 1 (Hybrid Search) + Fix 5 (Contextual Merging)
+    """
     try:
+        # Detect query language
+        query_language, query_namespace = _multilingual_manager.detect_and_route(query)
+        
+        logger.info(f"Processing query in {query_language} (namespace: {query_namespace})")
+        logger.info(f"Enhanced retrieval: {'ENABLED' if use_enhanced_retrieval else 'DISABLED'}")
+        
+        # Initialize LLM
         llm = ChatGroq(model_name="llama-3.3-70b-versatile", temperature=0.1)
+        
+        # Choose retriever based on enhancement flag
+        if use_enhanced_retrieval:
+            # Use enhanced retriever with Hybrid Search + Contextual Merging
+            try:
+                enhanced_retriever = create_enhanced_retriever(
+                    vectorstore=vectorstore,
+                    enable_hybrid=True,  # Fix 1: Hybrid Search
+                    enable_merging=True,  # Fix 5: Contextual Merging
+                    enable_query_expansion=False  # Keep disabled for now
+                )
+                retriever = enhanced_retriever
+                logger.info("Using ENHANCED retrieval (Hybrid Search + Contextual Merging)")
+            except Exception as e:
+                logger.warning(f"Enhanced retrieval failed, falling back to standard: {e}")
+                retriever = vectorstore.as_retriever(search_kwargs={"k": 10})
+        else:
+            # Standard FAISS retrieval
+            retriever = vectorstore.as_retriever(search_kwargs={"k": 10})
+            logger.info("Using STANDARD FAISS retrieval")
+        
+        # Create retrieval chain
         qa_chain = RetrievalQA.from_chain_type(
             llm=llm, 
-            retriever=vectorstore.as_retriever(search_kwargs={"k": 6}),
+            retriever=retriever,
             return_source_documents=True  # Enable source documents return
         )
         result = qa_chain.invoke(query)
@@ -270,13 +315,17 @@ def get_user_query_response(vectorstore, query):
                         import os
                         document_name = os.path.basename(doc.metadata['source'])
                     
+                    # Get document language from metadata
+                    doc_language = doc.metadata.get('language', 'unknown')
+                    
                     # Use page_number (from enhanced chunker) instead of page
                     page_num = doc.metadata.get('page_number', doc.metadata.get('page', 'Unknown Page'))
                     
                     source_info = {
                         'document': document_name,
                         'page': page_num,
-                        'chunk_index': doc.metadata.get('chunk_index', 1)
+                        'chunk_index': doc.metadata.get('chunk_index', 1),
+                        'language': doc_language
                     }
                     # Create a unique identifier for the source
                     source_key = f"{source_info['document']}-{source_info['page']}"
@@ -284,15 +333,128 @@ def get_user_query_response(vectorstore, query):
                         sources.append(source_info)
                         seen_sources.add(source_key)
         
-        # Return both the answer and sources
+        logger.info(f"Query processed: found {len(sources)} source documents")
+        logger.info(f"Query language: {query_language}, Sources languages: {set(s['language'] for s in sources)}")
+        
+        # Return both the answer and sources with language info
         return {
             'result': result.get('result', 'No answer found'),
-            'sources': sources
+            'sources': sources,
+            'query_language': query_language,
+            'query_namespace': query_namespace
         }
         
     except Exception as e:
         logger.error(f"Error in RAG query: {e}")
         raise e
+
+
+def get_user_query_response_enhanced(vectorstore, query, 
+                                    enable_hybrid: bool = True,
+                                    enable_merging: bool = True,
+                                    enable_query_expansion: bool = False):
+    """
+    Enhanced query processing with Hybrid Search (Fix 1) and Contextual Merging (Fix 5).
+    
+    Args:
+        vectorstore: FAISS vector store
+        query: User query
+        enable_hybrid: Enable BM25 + FAISS hybrid search
+        enable_merging: Enable contextual chunk merging
+        enable_query_expansion: Enable query expansion (experimental)
+        
+    Returns:
+        Dict with result, sources, and query metadata
+    """
+    try:
+        # Detect query language
+        query_language, query_namespace = _multilingual_manager.detect_and_route(query)
+        
+        logger.info(f"🔍 Enhanced RAG - Processing query in {query_language}")
+        logger.info(f"   Hybrid Search: {enable_hybrid} | Merging: {enable_merging} | Expansion: {enable_query_expansion}")
+        
+        # Initialize LLM
+        llm = ChatGroq(model_name="llama-3.3-70b-versatile", temperature=0.1)
+        
+        # Create enhanced retriever
+        enhanced_retriever = create_enhanced_retriever(
+            vectorstore=vectorstore,
+            documents=None,  # Will be extracted from vectorstore
+            llm=llm if enable_query_expansion else None,
+            enable_hybrid=enable_hybrid,
+            enable_merging=enable_merging,
+            enable_query_expansion=enable_query_expansion
+        )
+        
+        # Get enhanced documents
+        retrieved_docs = enhanced_retriever.get_relevant_documents(query, k=10)
+        
+        # Create QA chain with enhanced retrieval
+        from langchain.chains.question_answering import load_qa_chain
+        qa_chain = load_qa_chain(llm, chain_type="stuff")
+        
+        # Run QA with enhanced documents
+        result = qa_chain.invoke({
+            "input_documents": retrieved_docs,
+            "question": query
+        })
+        
+        # Extract sources from enhanced documents
+        sources = []
+        seen_sources = set()
+        for doc in retrieved_docs:
+            if hasattr(doc, 'metadata') and doc.metadata:
+                # Use filename if available
+                document_name = doc.metadata.get('filename', 'Unknown Document')
+                if document_name == 'Unknown Document' and 'source' in doc.metadata:
+                    import os
+                    document_name = os.path.basename(doc.metadata['source'])
+                
+                doc_language = doc.metadata.get('language', 'unknown')
+                page_num = doc.metadata.get('page_number', doc.metadata.get('page', 'Unknown Page'))
+                
+                # Check if this was a merged chunk
+                merged_chunks = doc.metadata.get('merged_chunks', 1)
+                chunk_range = doc.metadata.get('chunk_range', str(doc.metadata.get('chunk_index', 1)))
+                
+                source_info = {
+                    'document': document_name,
+                    'page': page_num,
+                    'chunk_index': doc.metadata.get('chunk_index', 1),
+                    'language': doc_language,
+                    'merged_chunks': merged_chunks if merged_chunks > 1 else None,
+                    'chunk_range': chunk_range if merged_chunks > 1 else None
+                }
+                
+                source_key = f"{source_info['document']}-{source_info['page']}"
+                if source_key not in seen_sources:
+                    sources.append(source_info)
+                    seen_sources.add(source_key)
+        
+        logger.info(f"✅ Enhanced query processed: {len(sources)} source documents")
+        logger.info(f"   Merged chunks: {sum(1 for s in sources if s.get('merged_chunks'))}")
+        
+        return {
+            'result': result.get('output_text', 'No answer found'),
+            'sources': sources,
+            'query_language': query_language,
+            'query_namespace': query_namespace,
+            'enhanced': True,
+            'retrieval_stats': {
+                'hybrid_search': enable_hybrid,
+                'contextual_merging': enable_merging,
+                'query_expansion': enable_query_expansion,
+                'total_sources': len(sources),
+                'merged_sources': sum(1 for s in sources if s.get('merged_chunks'))
+            }
+        }
+        
+    except Exception as e:
+        logger.error(f"Error in enhanced RAG query: {e}")
+        # Fallback to standard retrieval
+        logger.warning("Falling back to standard retrieval")
+        return get_user_query_response(vectorstore, query)
+
 
 
 def get_general_llm_response(query):

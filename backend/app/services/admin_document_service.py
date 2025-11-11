@@ -109,59 +109,29 @@ class AdminDocumentService:
             if AdminDocumentService.document_exists_by_hash(document_hash):
                 raise ValueError("Document with identical content already exists")
             
-            # Check for inactive document with same hash that can be reactivated
-            inactive_doc = AdminDocumentService.get_inactive_document_by_hash(document_hash)
-            
-            if inactive_doc:
-                logger.info(f"Found inactive document with same hash. Will reactivate document ID: {inactive_doc['id']}")
+            # NOTE: Removed reactivation logic - always process from scratch
+            # This ensures:
+            # 1. Latest processing code is used
+            # 2. Faster processing (building from scratch is faster than reactivating)
+            # 3. Fresh vectors with current embedding models
             
             with get_db_connection() as conn:
                 cursor = conn.cursor()
                 
-                if inactive_doc:
-                    # Reactivate the existing document
-                    logger.info(f"Reactivating previously deleted document: {filename}")
-                    cursor.execute("""
-                        UPDATE admin_documents 
-                        SET filename = %s, 
-                            original_filename = %s, 
-                            file_path = %s, 
-                            file_size = %s,
-                            uploaded_by = %s,
-                            processing_status = 'pending',
-                            is_active = true,
-                            created_at = CURRENT_TIMESTAMP,
-                            updated_at = CURRENT_TIMESTAMP
-                        WHERE id = %s
-                        RETURNING *
-                    """, (filename, original_filename, file_path, file_size, uploaded_by, inactive_doc['id']))
-                    
-                    result = cursor.fetchone()
-                    conn.commit()
-                    
-                    logger.info(f"Reactivated admin document: {filename} (ID: {inactive_doc['id']})")
-                    
-                    # Also reactivate in vector store if chunks exist
-                    vector_reactivation_success = AdminDocumentService.reactivate_document_complete(inactive_doc['id'])
-                    
-                    if not vector_reactivation_success:
-                        logger.warning(f"Document reactivated but vector store reactivation failed for ID: {inactive_doc['id']}")
-                    
-                    return dict(result)
-                else:
-                    # Create new document
-                    cursor.execute("""
-                        INSERT INTO admin_documents 
-                        (filename, original_filename, file_path, file_size, document_hash, uploaded_by, processing_status)
-                        VALUES (%s, %s, %s, %s, %s, %s, 'pending')
-                        RETURNING *
-                    """, (filename, original_filename, file_path, file_size, document_hash, uploaded_by))
-                    
-                    result = cursor.fetchone()
-                    conn.commit()
-                    
-                    logger.info(f"Created new admin document record: {filename}")
-                    return dict(result)
+                # Always create new document - no reactivation
+                logger.info(f"Creating new admin document: {filename}")
+                cursor.execute("""
+                    INSERT INTO admin_documents 
+                    (filename, original_filename, file_path, file_size, document_hash, uploaded_by, processing_status)
+                    VALUES (%s, %s, %s, %s, %s, %s, 'pending')
+                    RETURNING *
+                """, (filename, original_filename, file_path, file_size, document_hash, uploaded_by))
+                
+                result = cursor.fetchone()
+                conn.commit()
+                
+                logger.info(f"Created new admin document record: {filename}")
+                return dict(result)
                 
         except Exception as e:
             logger.error(f"Error creating/reactivating admin document: {str(e)}")
@@ -311,19 +281,39 @@ class AdminDocumentService:
         try:
             # Import here to avoid circular imports
             from .global_vector_store_manager import GlobalVectorStoreManager
+            import os
             
             with get_db_connection() as conn:
                 cursor = conn.cursor()
                 
+                # Get document info before deletion (to get file path)
+                cursor.execute("""
+                    SELECT file_path, original_filename 
+                    FROM admin_documents 
+                    WHERE id = %s
+                """, (document_id,))
+                
+                doc_info = cursor.fetchone()
+                if not doc_info:
+                    logger.warning(f"Document {document_id} not found")
+                    return False
+                
+                file_path = doc_info['file_path'] if isinstance(doc_info, dict) else doc_info[0]
+                original_filename = doc_info['original_filename'] if isinstance(doc_info, dict) else doc_info[1]
+                
                 if soft_delete:
-                    # Soft delete: mark as inactive in database
+                    # Soft delete: mark as inactive and clear hash to allow re-upload
+                    # Clearing hash prevents unique constraint violation when same file is re-uploaded
                     cursor.execute("""
                         UPDATE admin_documents 
-                        SET is_active = false, updated_at = CURRENT_TIMESTAMP
+                        SET is_active = false, 
+                            document_hash = NULL,
+                            updated_at = CURRENT_TIMESTAMP
                         WHERE id = %s
                     """, (document_id,))
                     
                     conn.commit()
+                    logger.info(f"Soft deleted document {document_id} ({original_filename}) and cleared hash for re-upload")
                     
                     # Remove from global vector store (this will mark chunks as inactive and rebuild)
                     vector_manager = GlobalVectorStoreManager()
@@ -335,9 +325,25 @@ class AdminDocumentService:
                     else:
                         logger.info(f"Successfully removed document {document_id} from global vector store")
                     
+                    # Delete physical file for soft delete as well
+                    if file_path and os.path.exists(file_path):
+                        try:
+                            os.remove(file_path)
+                            logger.info(f"Deleted physical file: {file_path}")
+                        except Exception as file_error:
+                            logger.error(f"Failed to delete physical file {file_path}: {file_error}")
+                    
                 else:
                     # Hard delete: completely remove from vector store and chunks first
                     GlobalVectorStoreService.remove_document_from_global_store(document_id)
+                    
+                    # Delete physical file before database record
+                    if file_path and os.path.exists(file_path):
+                        try:
+                            os.remove(file_path)
+                            logger.info(f"Deleted physical file: {file_path}")
+                        except Exception as file_error:
+                            logger.error(f"Failed to delete physical file {file_path}: {file_error}")
                     
                     # Then delete the document record (this will cascade to chunks due to foreign key)
                     cursor.execute("DELETE FROM admin_documents WHERE id = %s", (document_id,))
@@ -347,6 +353,7 @@ class AdminDocumentService:
                     vector_manager = GlobalVectorStoreManager()
                     vector_manager._rebuild_global_store()
                 
+                logger.success(f"Document {document_id} ({original_filename}) deleted successfully (soft_delete={soft_delete})")
                 return True
                 
         except Exception as e:

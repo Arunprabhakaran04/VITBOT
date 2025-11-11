@@ -7,7 +7,14 @@ from loguru import logger
 
 from ...oauth2 import get_current_user
 from ...schemas import TokenData
-from ..services.rag_handler import load_vectorstore_for_user, get_user_query_response, get_general_llm_response, clear_user_cache, get_cache_info
+from ..services.rag_handler import (
+    load_vectorstore_for_user, 
+    get_user_query_response, 
+    get_user_query_response_enhanced,
+    get_general_llm_response, 
+    clear_user_cache, 
+    get_cache_info
+)
 from ..services.chat_db_service import ChatDBService
 from ..services.rag_service import DocumentProcessor
 from ..services.chat_cache import ChatCache
@@ -19,6 +26,7 @@ class ChatRequest(BaseModel):
     query: str
     chat_id: Optional[str] = None
     has_pdf: bool = False
+    use_enhanced_retrieval: bool = True  # Enable enhanced retrieval by default
 
 class ChatTitleUpdate(BaseModel):
     title: str
@@ -75,9 +83,26 @@ async def chat_with_rag(request: Request, data: ChatRequest, current_user: Token
                 source = "general"
             else:
                 logger.success("Using PDF context for response")
-                rag_response = get_user_query_response(vectorstore, data.query)
+                
+                # Use enhanced retrieval if enabled
+                if data.use_enhanced_retrieval:
+                    logger.info("🚀 Using ENHANCED retrieval (Hybrid Search + Contextual Merging)")
+                    rag_response = get_user_query_response_enhanced(
+                        vectorstore, 
+                        data.query,
+                        enable_hybrid=True,
+                        enable_merging=True,
+                        enable_query_expansion=False  # Keep disabled for now
+                    )
+                else:
+                    logger.info("Using standard retrieval")
+                    rag_response = get_user_query_response(vectorstore, data.query)
+                
                 response = rag_response.get('result') if isinstance(rag_response, dict) else rag_response
                 sources = rag_response.get('sources', []) if isinstance(rag_response, dict) else []
+                query_language = rag_response.get('query_language', 'unknown') if isinstance(rag_response, dict) else 'unknown'
+                query_namespace = rag_response.get('query_namespace', 'unknown') if isinstance(rag_response, dict) else 'unknown'
+                retrieval_stats = rag_response.get('retrieval_stats', {}) if isinstance(rag_response, dict) else {}
                 source = "rag"
         
         # Handle response format for backward compatibility
@@ -94,17 +119,26 @@ async def chat_with_rag(request: Request, data: ChatRequest, current_user: Token
         
         logger.success(f"Chat response sent (source: {source})")
         
-        # Prepare response with sources if available
+        # Prepare response with sources and language info if available
         response_data = {
             "response": response, 
             "source": source, 
             "cached": False
         }
         
-        # Add sources if this is a RAG response
+        # Add sources and language info if this is a RAG response
         if source == "rag" and 'sources' in locals() and sources:
             response_data["sources"] = sources
+            response_data["query_language"] = query_language if 'query_language' in locals() else 'unknown'
+            response_data["query_namespace"] = query_namespace if 'query_namespace' in locals() else 'unknown'
+            
+            # Add retrieval stats if enhanced retrieval was used
+            if 'retrieval_stats' in locals() and retrieval_stats:
+                response_data["retrieval_stats"] = retrieval_stats
+                logger.info(f"Enhanced retrieval stats: {retrieval_stats}")
+            
             logger.info(f"Including {len(sources)} source citations in response")
+            logger.info(f"Query language: {query_language}, Namespace: {query_namespace}")
         
         return response_data
             
@@ -209,3 +243,58 @@ async def clear_pdf(current_user: TokenData = Depends(get_current_user)):
     except Exception as e:
         logger.error(f"Error clearing PDF data: {str(e)}")
         raise HTTPException(status_code=500, detail="Error clearing PDF data")
+
+@router.get("/multilingual_info")
+async def get_multilingual_info(current_user: TokenData = Depends(get_current_user)):
+    """Get information about multilingual support"""
+    try:
+        from ..services.dual_embedding_manager import EmbeddingManager
+        
+        cache_status = EmbeddingManager.get_cache_status()
+        
+        return {
+            "multilingual_support": True,
+            "supported_languages": {
+                "english": "English",
+                "tamil": "Tamil (தமிழ்)",
+                "hindi": "Hindi (हिन्दी)",
+                "telugu": "Telugu (తెలుగు)",
+                "kannada": "Kannada (ಕನ್ನಡ)",
+                "malayalam": "Malayalam (മലയാളം)",
+                "bengali": "Bengali (বাংলা)",
+                "marathi": "Marathi (मराठी)",
+                "gujarati": "Gujarati (ગુજરાતી)",
+                "punjabi": "Punjabi (ਪੰਜਾਬੀ)",
+                "urdu": "Urdu (اردو)"
+            },
+            "models": {
+                "english": {
+                    "name": EmbeddingManager.ENGLISH_MODEL,
+                    "dimensions": EmbeddingManager.ENGLISH_DIMENSIONS,
+                    "loaded": "english" in cache_status['cached_languages']
+                },
+                "multilingual": {
+                    "name": EmbeddingManager.MULTILINGUAL_MODEL,
+                    "dimensions": EmbeddingManager.MULTILINGUAL_DIMENSIONS,
+                    "loaded": "multilingual" in cache_status['cached_languages']
+                }
+            },
+            "features": [
+                "Upload PDFs in English or Indian languages",
+                "Ask questions in any supported language",
+                "Automatic language detection",
+                "Optimized retrieval for each language"
+            ],
+            "how_it_works": [
+                "When you upload a PDF, the system detects its language",
+                "Documents are processed with the appropriate embedding model",
+                "English docs use a specialized English model (faster, smaller)",
+                "Multilingual docs use a comprehensive model supporting 11+ languages",
+                "When you ask a question, the system detects your query language",
+                "Retrieval is optimized based on the detected language"
+            ]
+        }
+        
+    except Exception as e:
+        logger.error(f"Error getting multilingual info: {str(e)}")
+        raise HTTPException(status_code=500, detail="Error fetching multilingual information")

@@ -40,7 +40,15 @@ logging.basicConfig(
 )
 
 # Add loguru compatibility with standard logging (UTF-8 safe)
-logger.add("vitbot_detailed.log", rotation="1 day", retention="7 days", level="DEBUG", encoding='utf-8')
+# Use enqueue=True to prevent file locking issues on Windows in multi-process environments
+logger.add(
+    "vitbot_detailed.log", 
+    rotation="1 day", 
+    retention="7 days", 
+    level="DEBUG", 
+    encoding='utf-8',
+    enqueue=True  # Use queue to prevent file locking issues
+)
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -67,18 +75,23 @@ async def lifespan(app: FastAPI):
         get_connection_pool()
         logger.info("Database connection pool initialized")
         
-        # Initialize embeddings model at startup (production-ready approach)
-        logger.info("Initializing embeddings model - this may take a few minutes on first run...")
-        logger.info("Downloading/loading BAAI/bge-small-en-v1.5 model...")
+        # Initialize embeddings models at startup (production-ready approach)
+        logger.info("Initializing embeddings models - this may take a few minutes on first run...")
+        logger.info("Loading English model: BAAI/bge-small-en-v1.5 (384D)...")
+        logger.info("Loading Multilingual model: intfloat/multilingual-e5-large (1024D)...")
         
         try:
-            from backend.app.services.rag_service import DocumentProcessor
-            processor = DocumentProcessor()
-            # Trigger embeddings model initialization
-            _ = processor.embeddings_model
-            logger.success("Embeddings model loaded successfully!")
+            from backend.app.services.dual_embedding_manager import EmbeddingManager
+            
+            # Preload both models for optimal performance
+            EmbeddingManager.preload_models(['english', 'multilingual'])
+            
+            logger.success("✓ English embeddings model loaded successfully (384D)")
+            logger.success("✓ Multilingual embeddings model loaded successfully (1024D)")
+            logger.success("Both embedding models are ready for multilingual RAG!")
+            
         except Exception as e:
-            logger.error(f"Failed to initialize embeddings model: {e}")
+            logger.error(f"Failed to initialize embeddings models: {e}")
             logger.warning("PDF processing may be slower on first use")
             # Don't fail startup - embeddings will initialize on first use
         

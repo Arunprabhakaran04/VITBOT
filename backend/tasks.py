@@ -47,6 +47,16 @@ def process_pdf_task(self, user_id: int, file_path: str, filename: str):
         total_chars = sum(len(page['text']) for page in page_texts)
         logger.info(f"PDF text extracted successfully - {total_chars} characters from {len(page_texts)} pages, Language: {language}")
         
+        # Log which embedding model will be used
+        from .app.services.dual_embedding_manager import EmbeddingManager
+        namespace = EmbeddingManager.get_namespace_for_language(language)
+        model_name = EmbeddingManager.ENGLISH_MODEL if namespace == 'english_docs' else EmbeddingManager.MULTILINGUAL_MODEL
+        model_dims = EmbeddingManager.ENGLISH_DIMENSIONS if namespace == 'english_docs' else EmbeddingManager.MULTILINGUAL_DIMENSIONS
+        
+        logger.info(f"→ Language: {language.upper()}")
+        logger.info(f"→ Namespace: {namespace}")
+        logger.info(f"→ Embedding Model: {model_name} ({model_dims}D)")
+        
         # Update progress - Text splitting
         logger.info(f"Splitting {language} text into chunks...")
         self.update_state(state='PROCESSING', meta={'message': f'Splitting {language} text into chunks...'})
@@ -78,12 +88,13 @@ def process_pdf_task(self, user_id: int, file_path: str, filename: str):
         logger.info(f"Vector store saved to: {vector_store_path}")
 
         # Update progress - Updating database with language info
-        logger.info("Finalizing database update with language information...")
+        logger.info("Finalizing database update with language and namespace information...")
         self.update_state(state='PROCESSING', meta={'message': 'Finalizing...'})
         TaskService.update_task_status(task_id, 'processing', 'Finalizing...')
 
-        # Get embedding model name for saving (always English now)
-        embedding_model = EmbeddingManager.MODEL
+        # Get embedding model name and namespace for saving
+        namespace = EmbeddingManager.get_namespace_for_language(language)
+        embedding_model = EmbeddingManager.ENGLISH_MODEL if namespace == 'english_docs' else EmbeddingManager.MULTILINGUAL_MODEL
 
         with get_db_connection() as conn:
             save_vector_store_path(conn, user_id, vector_store_path, language, embedding_model)
@@ -92,14 +103,16 @@ def process_pdf_task(self, user_id: int, file_path: str, filename: str):
         TaskService.update_task_status(task_id, 'completed', f'{language.title()} PDF processed successfully')
 
         logger.info(f"{language.title()} PDF processing completed successfully for user {user_id}")
-        logger.info(f"Final stats: {vector_store.index.ntotal} vectors, {len(chunks_with_metadata)} chunks, Language: {language}")
-        logger.info(f"Embedding model used: {embedding_model}")
+        logger.info(f"Final stats: {vector_store.index.ntotal} vectors, {len(chunks_with_metadata)} chunks")
+        logger.info(f"Language: {language} | Namespace: {namespace}")
+        logger.info(f"Embedding model: {embedding_model}")
 
         return {
             'status': 'completed',
             'message': f'{language.title()} PDF processed successfully',
             'vector_count': vector_store.index.ntotal,
             'language': language,
+            'namespace': namespace,
             'embedding_model': embedding_model,
             'chunks_count': len(chunks_with_metadata)
         }
@@ -160,6 +173,15 @@ def process_admin_pdf_task(self, document_id: int, file_path: str, filename: str
         total_chars = sum(len(page['text']) for page in page_texts)
         logger.info(f"Admin PDF text extracted - {total_chars} characters from {len(page_texts)} pages, Language: {language}")
         
+        # Log which embedding model will be used for admin document
+        namespace = EmbeddingManager.get_namespace_for_language(language)
+        model_name = EmbeddingManager.ENGLISH_MODEL if namespace == 'english_docs' else EmbeddingManager.MULTILINGUAL_MODEL
+        model_dims = EmbeddingManager.ENGLISH_DIMENSIONS if namespace == 'english_docs' else EmbeddingManager.MULTILINGUAL_DIMENSIONS
+        
+        logger.info(f"→ Admin Document Language: {language.upper()}")
+        logger.info(f"→ Namespace: {namespace}")
+        logger.info(f"→ Embedding Model: {model_name} ({model_dims}D)")
+        
         # Split text into chunks
         logger.info(f"Splitting {language} text into chunks...")
         self.update_state(state='PROCESSING', meta={'message': f'Splitting {language} text into chunks...'})
@@ -189,7 +211,8 @@ def process_admin_pdf_task(self, document_id: int, file_path: str, filename: str
         self.update_state(state='PROCESSING', meta={'message': 'Finalizing admin document...'})
         TaskService.update_task_status(task_id, 'processing', 'Finalizing admin document...')
 
-        embedding_model = EmbeddingManager.MODEL
+        namespace = EmbeddingManager.get_namespace_for_language(language)
+        embedding_model = EmbeddingManager.ENGLISH_MODEL if namespace == 'english_docs' else EmbeddingManager.MULTILINGUAL_MODEL
 
         # Update admin document record
         AdminDocumentService.update_document_processing_status(
@@ -207,7 +230,9 @@ def process_admin_pdf_task(self, document_id: int, file_path: str, filename: str
         TaskService.update_task_status(task_id, 'completed', f'Admin {language.title()} PDF processed successfully')
 
         logger.info(f"Admin PDF processing completed successfully for document {document_id}")
-        logger.info(f"Final stats - Global vectors: {stats['total_vectors']}, Document chunks: {len(chunks_with_metadata)}, Language: {language}")
+        logger.info(f"Final stats - Global vectors: {stats['total_vectors']}, Document chunks: {len(chunks_with_metadata)}")
+        logger.info(f"Language: {language} | Namespace: {namespace}")
+        logger.info(f"Embedding model: {embedding_model}")
 
         return {
             'status': 'completed',
@@ -216,6 +241,7 @@ def process_admin_pdf_task(self, document_id: int, file_path: str, filename: str
             'global_vector_count': stats['total_vectors'],
             'document_chunks': len(chunks_with_metadata),
             'language': language,
+            'namespace': namespace,
             'embedding_model': embedding_model,
             'total_documents': stats['total_documents']
         }

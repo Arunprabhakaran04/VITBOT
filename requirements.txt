@@ -16,3 +16,6 @@ PyJWT
 passlib[bcrypt]
 sentence-transformers
 nltk
+langdetect
+fasttext
+rank-bm25

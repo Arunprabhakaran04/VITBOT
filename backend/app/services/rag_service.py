@@ -8,12 +8,13 @@ from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_groq import ChatGroq
 from loguru import logger
 
-# Import services for English document processing
+# Import services for multilingual document processing
 from .language_service import LanguageDetector
 from .enhanced_pdf_extractor import EnhancedPDFExtractor
 from .dual_embedding_manager import EmbeddingManager
 from .language_aware_text_splitter import TextSplitter
 from .enhanced_pdf_chunker import EnhancedPDFChunker
+from .multilingual_vector_store_manager import MultilingualVectorStoreManager
 
 # Global cache for embeddings model - production-ready singleton pattern
 _embeddings_model = None
@@ -35,12 +36,13 @@ class DocumentProcessor:
             raise ValueError("GROQ_API_KEY not provided or set in environment variables. Please check your .env file.")
         os.environ["GROQ_API_KEY"] = self.api_key
 
-        # Initialize services for English document processing
+        # Initialize services for multilingual document processing
         self.language_detector = LanguageDetector()
         self.pdf_extractor = EnhancedPDFExtractor()
         self.embedding_manager = EmbeddingManager()
         self.text_splitter = TextSplitter()
         self.enhanced_pdf_chunker = EnhancedPDFChunker()
+        self.multilingual_manager = MultilingualVectorStoreManager()
         
         # Keep legacy embeddings for backward compatibility
         self.embeddings = self._initialize_embeddings()
@@ -48,7 +50,7 @@ class DocumentProcessor:
         self.vector_store_dir = os.path.join(os.path.dirname(__file__), '../../vector_stores')
         os.makedirs(self.vector_store_dir, exist_ok=True)
         
-        logger.info("DocumentProcessor initialized with enhanced PDF chunking support")
+        logger.info("DocumentProcessor initialized with multilingual support and enhanced PDF chunking")
 
     def _initialize_embeddings(self):
         """Thread-safe embeddings model initialization"""
@@ -306,19 +308,25 @@ class DocumentProcessor:
             raise e
 
     def create_vector_store_with_metadata(self, chunks_with_metadata, language='english'):
-        """Create vector store with English embeddings and metadata"""
+        """Create vector store with appropriate embeddings and metadata based on language"""
         try:
-            # Get English embeddings model
-            embeddings = EmbeddingManager.get_embeddings_static()
-            
             # Extract texts and metadatas for FAISS
             texts = [chunk['text'] for chunk in chunks_with_metadata]
             metadatas = [chunk['metadata'] for chunk in chunks_with_metadata]
             
-            # Create vector store with metadata
-            vector_store = FAISS.from_texts(texts, embeddings, metadatas=metadatas)
+            # Add language info to metadata
+            for metadata in metadatas:
+                metadata['language'] = language
             
-            logger.info(f"Created {language} vector store with {vector_store.index.ntotal} vectors and metadata")
+            # Use multilingual manager to create vector store with appropriate model
+            vector_store, namespace = self.multilingual_manager.create_vector_store(
+                texts, metadatas, language
+            )
+            
+            logger.info(f"Created {language} vector store with {vector_store.index.ntotal} vectors")
+            logger.info(f"  Namespace: {namespace}")
+            logger.info(f"  Model: {EmbeddingManager.ENGLISH_MODEL if namespace == 'english_docs' else EmbeddingManager.MULTILINGUAL_MODEL}")
+            
             return vector_store
             
         except Exception as e:
