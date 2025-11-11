@@ -6,10 +6,13 @@ import { Textarea } from '@/components/ui/textarea';
 import { useStore } from '@/lib/store';
 import { MessageList } from './MessageList';
 import { TypingIndicator } from './TypingIndicator';
+import { VoiceButton } from './VoiceButton';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { useVoiceRecording } from '@/hooks/use-voice-recording';
 import { chatAPI } from '@/lib/api';
 import { Badge } from '@/components/ui/badge';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { useToast } from '@/hooks/use-toast';
 
 export const ChatArea = () => {
   const { 
@@ -31,6 +34,24 @@ export const ChatArea = () => {
   } = useStore();
   const isMobile = useIsMobile();
   const [isLoading, setIsLoading] = useState(false);
+  const { toast } = useToast();
+  
+  const { isRecording, isTranscribing, startRecording, stopRecording } = useVoiceRecording({
+    onTranscriptionComplete: (transcript) => {
+      setMessageInput(transcript);
+      toast({
+        title: "Transcription complete",
+        description: "Voice input has been converted to text",
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "Voice recording failed",
+        description: error,
+        variant: "destructive",
+      });
+    }
+  });
   
   // Check user role
   const isAdmin = user?.role === 'admin';
@@ -307,6 +328,14 @@ export const ChatArea = () => {
             <Paperclip className="w-4 h-4" />
           </Button>
           
+          <VoiceButton
+            isRecording={isRecording}
+            isTranscribing={isTranscribing}
+            onStartRecording={startRecording}
+            onStopRecording={stopRecording}
+            disabled={isLoading || (!isAdmin && !hasAdminDocuments)}
+          />
+          
           <div className="flex-1 relative">
             <Textarea
               value={messageInput}
@@ -341,7 +370,7 @@ export const ChatArea = () => {
         </div>
         
         <p className="text-xs text-muted-foreground mt-2 text-center">
-          Press Enter to send, Shift+Enter for new line
+          Press Enter to send, Shift+Enter for new line • Click mic for voice search
         </p>
       </div>
     </div>

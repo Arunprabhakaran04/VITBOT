@@ -19,3 +19,4 @@ nltk
 langdetect
 fasttext
 rank-bm25
+requests

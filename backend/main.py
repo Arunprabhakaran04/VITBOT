@@ -7,7 +7,7 @@ from dotenv import load_dotenv
 # Load environment variables from .env file
 load_dotenv()
 from fastapi import FastAPI
-from backend.app.routers import users, chat_rbac as chat, pdf_celery as pdf, admin
+from backend.app.routers import users, chat_rbac as chat, pdf_celery as pdf, admin, transcription
 from backend.database_connection import get_connection_pool, close_connection_pool
 from backend.app.services.background_task_service import background_service
 from backend.app.services.pdf_processing_service import pdf_processing_service
@@ -147,6 +147,7 @@ app.include_router(users.router)
 app.include_router(chat.router) 
 app.include_router(pdf.router)
 app.include_router(admin.router)
+app.include_router(transcription.router)
 
 @app.get("/health")
 async def health_check():
